@@ -25,6 +25,10 @@ cardSchema.methods.toCardResponse = function () {
     };
 };
 
+module.exports = mongoose.model('Card', cardSchema);
+
+// BODY PARA CREAR CARTAS EN POSTMAN
+//
 // {
 //     "name": "Turtwig",
 //     "power": 1,
@@ -34,5 +38,3 @@ cardSchema.methods.toCardResponse = function () {
 //     "image": "turtwig.png",
 //     "isMana": false
 // }
-
-module.exports = mongoose.model('Card', cardSchema);
