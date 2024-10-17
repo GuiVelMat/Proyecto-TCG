@@ -34,6 +34,7 @@ app.use((req, res, next) => {
 
 require('./app/routes/user.routes')(app);
 require('./app/routes/card.routes')(app);
+require('./app/routes/auth.routes')(app);
 
 app.get("/", function (_req, res) {
     return res.send("El servidor esta funcionando");
