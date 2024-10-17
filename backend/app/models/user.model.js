@@ -32,4 +32,17 @@ userSchema.methods.toUserResponse = function () {
     };
 };
 
+userSchema.methods.toUserCompleteResponse = function (deck, album) {
+    return {
+        username: this.username,
+        email: this.email,
+        credits: this.credits,
+        boughtFoil: this.boughtFoil,
+        isFoilActive: this.isFoilActive,
+        deck: deck,
+        album: album,
+    };
+}
+
+
 module.exports = mongoose.model('User', userSchema);

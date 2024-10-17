@@ -6,5 +6,9 @@ module.exports = (app) => {
 
     app.get('/user/:username', userController.findOneUser);
 
-    app.post('/user/:username/addCard/:name', userController.addCardToAlbum);
+    app.post('/user/:username/album/:name', userController.addCardToAlbum);
+
+    app.post('/user/:username/deck/:name', userController.addCardToDeck);
+
+    app.delete('user/:username/deck/:name', userController.removeCardFromDeck);
 }
