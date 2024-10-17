@@ -10,5 +10,5 @@ module.exports = (app) => {
 
     app.post('/user/:username/deck/:name', userController.addCardToDeck);
 
-    app.delete('user/:username/deck/:name', userController.removeCardFromDeck);
+    app.delete('/user/:username/deck/:name', userController.removeCardFromDeck);
 }

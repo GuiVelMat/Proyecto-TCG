@@ -1,19 +1,25 @@
 const User = require('../models/user.model');
 const Card = require('../models/card.model');
 
-//mostrar todos los users
 exports.findUsers = async (req, res) => {
     try {
         const users = await User.find().exec();
-        const deck = await Card.find({ _id: { $in: users.album } }).exec();
-        return res.json(deck)
-        // const album = await Card.find({ _id: { $in: users.map(user => user.album) } }).exec();
 
-        res.status(200).json({ users: users.map(user => user.toUserCompleteResponse(deck, album)) });
+        const userResponses = await Promise.all(users.map(async user => {
+            // Fetch the deck and album for each user
+            const deck = await Card.find({ _id: { $in: user.deck } }).exec();
+            const album = await Card.find({ _id: { $in: user.album } }).exec();
+
+            return user.toUserCompleteResponse(deck, album);
+        }));
+
+        // Send back the formatted user responses
+        res.status(200).json({ users: userResponses });
     } catch (error) {
         res.status(500).json({ message: "Error retrieving users", error: error.message });
     }
 };
+
 
 exports.findOneUser = async (req, res) => {
     try {
@@ -34,7 +40,7 @@ exports.addCardToAlbum = async (req, res) => {
     try {
         const { username, name } = req.params;
 
-        const user = await User.findOne({ name: username })
+        const user = await User.findOne({ username: username })
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -74,9 +80,9 @@ exports.addCardToDeck = async (req, res) => {
 
 exports.removeCardFromDeck = async (req, res) => {
     try {
-        const { username, name } = req.body;
+        const { username, name } = req.params;
 
-        const user = await User.findOne({ name: username })
+        const user = await User.findOne({ username: username })
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
