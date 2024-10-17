@@ -27,8 +27,8 @@ userSchema.methods.toUserResponse = function () {
         credits: this.credits,
         boughtFoil: this.boughtFoil,
         isFoilActive: this.isFoilActive,
-        // deck: this.deck,
-        // album: this.collection,
+        deck: this.deck,
+        album: this.album,
     };
 };
 

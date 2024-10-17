@@ -7,4 +7,6 @@ module.exports = (app) => {
     app.post("/user/login", userController.loginUser);
 
     app.post("/user/register", userController.registerUser);
+
+    app.post('/user/:username/addCard/:name', userController.addCardToAlbum)
 }
