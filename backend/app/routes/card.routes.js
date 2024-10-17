@@ -6,5 +6,7 @@ module.exports = (app) => {
 
     app.get('/card/:name', cardController.findOneCard);
 
+    app.get('/cardRandom/', cardController.getRandomCardFromAlbum);
+
     app.post('/card/create', cardController.createCard);
 } 

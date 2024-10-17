@@ -34,3 +34,31 @@ exports.findOneCard = async (req, res) => {
         res.status(500).json({ message: "Error retrieving card", error: error.message });
     }
 }
+
+exports.getRandomCardFromAlbum = async (req, res) => {
+    try {
+        let Rarity;
+        const randomNum = Math.random();
+
+        if (randomNum < 0.7) {
+            Rarity = 'common';
+        } else if (randomNum > 0.7 && randomNum < 0.9) {
+            Rarity = 'uncommon';
+        } else {
+            Rarity = 'rare';
+        }
+
+        const cards = await Card.find().exec();
+        const filteredCards = cards.filter(card => card.rarity === Rarity);
+
+        if (filteredCards.length === 0) {
+            return res.status(404).json({ message: `No ${selectedRarity} cards available` });
+        }
+
+        const randomCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
+
+        res.status(200).json(randomCard.toCardResponse());
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving random card", error: error.message });
+    }
+}
