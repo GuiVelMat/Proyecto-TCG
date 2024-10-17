@@ -12,6 +12,18 @@ exports.findUsers = async (req, res) => {
     }
 };
 
+exports.findOneUser = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.params.username }).exec();
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({ user: user.toUserResponse() });
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving user", error: error.message });
+    }
+}
+
 exports.registerUser = async (req, res) => {
     const user = req.body;
 
@@ -63,11 +75,6 @@ exports.addCardToAlbum = async (req, res) => {
         }
 
         const card = await Card.findOne({ name: name });
-        // return res.json(card);
-
-        // if (user.album.includes(cardId)) {
-        //     return res.status(400).json({ message: "Card already in album" });
-        // }
 
         user.album.push(card._id);
         await user.save();

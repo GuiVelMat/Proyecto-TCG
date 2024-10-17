@@ -4,6 +4,8 @@ module.exports = (app) => {
 
     app.get('/users', userController.findUsers);
 
+    app.get('/user/:username', userController.findOneUser);
+
     app.post("/user/login", userController.loginUser);
 
     app.post("/user/register", userController.registerUser);
