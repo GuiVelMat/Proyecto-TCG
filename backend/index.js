@@ -17,9 +17,13 @@ const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect(dbConfig.url, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected...'))
-    .catch(err => console.log('MongoDB connection error:', err));
+mongoose.connect(dbConfig.url, {})
+    .then(() => {
+        console.log("Successfully connected to the database");
+    }).catch(err => {
+        console.log('Could not connect to the database. Exiting now...', err);
+        process.exit();
+    });
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
