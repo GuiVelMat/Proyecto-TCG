@@ -111,7 +111,6 @@ exports.removeCardFromDeck = async (req, res) => {
 }
 
 exports.randomCardToAlbum = async (req, res) => {
-    // return res.json("hola")
     try {
         const { username } = req.params;
 

@@ -1,8 +1,8 @@
-import cardService from "../core/services/card.service";
+import CardService from "../core/services/card.service.js";
 
-async function loadCards() {
+const loadAlbum = async () => {
     try {
-        const cards = await cardService.getCardList();
+        const cards = await CardService.getCardList();
         console.log(cards);
         // Render the cards in the UI
     } catch (error) {
@@ -10,4 +10,15 @@ async function loadCards() {
     }
 }
 
-loadCards();
+const loadRandomCard = async () => {
+    try {
+        const card = await CardService.getRandomCard();
+        console.log(card);
+        // Render the card in the UI
+    } catch (error) {
+        console.error('Error loading random card:', error);
+    }
+}
+
+loadAlbum();
+// loadRandomCard();
