@@ -1,0 +1,21 @@
+.album-container {
+    padding: 20px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.card img {
+    max-width: 100%;
+    border-radius: 4px;
+}
