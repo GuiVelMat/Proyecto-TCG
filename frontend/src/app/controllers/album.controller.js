@@ -30,17 +30,17 @@ const renderCards = (cards) => {
 
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
-            <div class="card">
+            <div class="card" id="card">
                 <div class="card-title">
-                    <p>${card.name}</p>
-                    <p>${card.health}</p>
+                    <p class="card-name">${card.name}</p>
                 </div>
                 <div class="card-img">
                     <img src="${urlImg}" alt="${card.name}" />
                 </div>
                 <div class="card-info">
-                    <p>${card.power}</p>
-                    <p>${card.rarity}</p>
+                    <p class="power">${card.power}</p>
+                    <p class="rarity">${card.rarity}</p>
+                    <p class="health">${card.health}</p>
                 </div>
             </div>
         `;
@@ -64,3 +64,9 @@ const renderCards = (cards) => {
 }
 
 loadAlbum().then(cards => renderCards(cards));
+
+export default {
+    loadAlbum,
+    loadRandomCard,
+    renderCards
+};
