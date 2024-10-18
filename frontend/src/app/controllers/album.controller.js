@@ -26,20 +26,40 @@ const renderCards = (cards) => {
     cardGrid.innerHTML = ''; // Clear any existing cards
 
     cards.forEach(card => {
-        const url = `http://localhost/Proyecto-TCG/frontend/src/assets/`
-        // console.log(card.image);
-        const cardElement = document.createElement('div');
-        cardElement.classList.add('card');
+        const urlImg = `${window.location.origin}/src/assets/${card.image}`;
 
-        const imgDiv = document.createElement('div');
-        imgDiv.innerHTML = `<img src="${url}${card.image}" alt="${card.name}">`;
-        cardElement.appendChild(imgDiv);
+        const renderedCard = document.createElement('div');
+        renderedCard.innerHTML = `
+            <div class="card">
+                <div class="card-title">
+                    <p>${card.name}</p>
+                    <p>${card.health}</p>
+                </div>
+                <div class="card-img">
+                    <img src="${urlImg}" alt="${card.name}" />
+                </div>
+                <div class="card-info">
+                    <p>${card.power}</p>
+                    <p>${card.rarity}</p>
+                </div>
+            </div>
+        `;
 
-        const nameElement = document.createElement('p');
-        nameElement.textContent = card.name;
-        cardElement.appendChild(nameElement);
+        switch (card.type) {
+            case 'fire':
+                renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
+                break;
+            case 'water':
+                renderedCard.querySelector('.card').style.backgroundColor = 'skyblue';
+                break;
+            case 'grass':
+                renderedCard.querySelector('.card').style.backgroundColor = 'lightgreen';
+                break;
+            case 'mana':
+                renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
+        }
 
-        cardGrid.appendChild(cardElement);
+        cardGrid.appendChild(renderedCard);
     });
 }
 
