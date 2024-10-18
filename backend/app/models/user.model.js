@@ -29,6 +29,8 @@ userSchema.methods.toUserResponse = function () {
         credits: this.credits,
         boughtFoil: this.boughtFoil,
         isFoilActive: this.isFoilActive,
+        album: this.album,
+        deck: this.deck
     };
 };
 

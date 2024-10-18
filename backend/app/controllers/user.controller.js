@@ -21,21 +21,52 @@ exports.findUsers = async (req, res) => {
     }
 };
 
-
 exports.findOneUser = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username }).exec();
-        const deck = await Card.find({ _id: { $in: user.deck } }).exec();
-        const album = await Card.find({ _id: { $in: user.album } }).exec();
-
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).json({ user: user.toUserCompleteResponse(deck, album) });
+
+        // Fetch all cards for the deck and album
+        const deckCards = await Card.find({ _id: { $in: user.deck } }).exec();
+        const albumCards = await Card.find({ _id: { $in: user.album } }).exec();
+
+        // Create a card map for quick access
+        const cardMap = {};
+        albumCards.forEach(card => {
+            cardMap[card._id] = card; // Store each card by its ID
+        });
+
+        const userDeck = user.deck.map(cardId => cardMap[cardId]);
+        const userAlbum = user.album.map(cardId => cardMap[cardId]);
+
+        res.status(200).json({ user: user.toUserCompleteResponse(userDeck, userAlbum) });
     } catch (error) {
+        console.error(error); // Log error for debugging
         res.status(500).json({ message: "Error retrieving user", error: error.message });
     }
-}
+};
+
+
+
+// exports.findOneUser = async (req, res) => {
+//     try {
+//         const user = await User.findOne({ username: req.params.username }).exec();
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+
+//         // const deck = await Card.find({ _id: { $in: user.deck } }).exec();
+//         // const album = await Card.find({ _id: { $in: user.album } }).exec();
+
+
+
+//         res.status(200).json({ user: user.toUserCompleteResponse(deck, album) });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error retrieving user", error: error.message });
+//     }
+// }
 
 exports.addCardToAlbum = async (req, res) => {
     try {
