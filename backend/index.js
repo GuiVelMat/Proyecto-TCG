@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // Configuring the database
-const dbConfig = require('./config/db/db.users');
+const dbConfig = require('./config/db');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
