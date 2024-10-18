@@ -48,26 +48,6 @@ exports.findOneUser = async (req, res) => {
     }
 };
 
-
-
-// exports.findOneUser = async (req, res) => {
-//     try {
-//         const user = await User.findOne({ username: req.params.username }).exec();
-//         if (!user) {
-//             return res.status(404).json({ message: "User not found" });
-//         }
-
-//         // const deck = await Card.find({ _id: { $in: user.deck } }).exec();
-//         // const album = await Card.find({ _id: { $in: user.album } }).exec();
-
-
-
-//         res.status(200).json({ user: user.toUserCompleteResponse(deck, album) });
-//     } catch (error) {
-//         res.status(500).json({ message: "Error retrieving user", error: error.message });
-//     }
-// }
-
 exports.addCardToAlbum = async (req, res) => {
     try {
         const { username, name } = req.params;
