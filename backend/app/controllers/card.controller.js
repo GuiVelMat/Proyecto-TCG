@@ -52,12 +52,12 @@ exports.getRandomCardFromAlbum = async (req, res) => {
         const filteredCards = cards.filter(card => card.rarity === Rarity);
 
         if (filteredCards.length === 0) {
-            return res.status(404).json({ message: `No ${selectedRarity} cards available` });
+            return res.status(404).json({ message: `No ${Rarity} cards available` });
         }
 
         const randomCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
 
-        res.status(200).json(randomCard.toCardResponse());
+        return randomCard.toCardResponse();
     } catch (error) {
         res.status(500).json({ message: "Error retrieving random card", error: error.message });
     }

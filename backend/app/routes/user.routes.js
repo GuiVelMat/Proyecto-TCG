@@ -8,6 +8,8 @@ module.exports = (app) => {
 
     app.post('/user/:username/album/:name', userController.addCardToAlbum);
 
+    app.post('/user/:username/albumAddRandom', userController.randomCardToAlbum);
+
     app.post('/user/:username/deck/:name', userController.addCardToDeck);
 
     app.delete('/user/:username/deck/:name', userController.removeCardFromDeck);

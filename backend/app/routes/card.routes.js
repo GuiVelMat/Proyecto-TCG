@@ -9,4 +9,4 @@ module.exports = (app) => {
     app.get('/cardRandom/', cardController.getRandomCardFromAlbum);
 
     app.post('/card/create', cardController.createCard);
-} 
+}

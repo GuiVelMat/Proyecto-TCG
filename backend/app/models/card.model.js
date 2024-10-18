@@ -7,6 +7,7 @@ const cardSchema = new mongoose.Schema({
     type: { type: String, required: true },
     rarity: { type: String, required: true },
     image: { type: String, required: true },
+    quantity: { type: Number, default: 1 },
     isMana: { type: Boolean, default: false },
 }, {
     timestamps: true
@@ -21,6 +22,7 @@ cardSchema.methods.toCardResponse = function () {
         type: this.type,
         rarity: this.rarity,
         image: this.image,
+        quantity: this.quantity,
         isMana: this.isMana,
     };
 };
