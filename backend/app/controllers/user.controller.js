@@ -91,6 +91,26 @@ exports.addCardToDeck = async (req, res) => {
     }
 }
 
+exports.generateInitialAlbum = async (username, req, res) => {
+    try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const fennekin = await Card.findOne({ name: "Fennekin" });
+        const mudkip = await Card.findOne({ name: "Mudkip" });
+        const turtwig = await Card.findOne({ name: "Turtwig" });
+        const basic_mana = await Card.findOne({ name: "Basic mana" });
+        const super_mana = await Card.findOne({ name: "Super mana" });
+
+        user.album.push(fennekin._id, mudkip._id, turtwig._id, basic_mana._id, basic_mana._id, basic_mana._id, super_mana._id);
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Error adding card to album", error: error.message });
+    }
+}
+
 exports.removeCardFromDeck = async (req, res) => {
     try {
         const { username, name } = req.params;
