@@ -2,13 +2,15 @@ module.exports = (app) => {
     const express = require('express');
     const userController = require('../controllers/user.controller.js');
 
-    const router = express.Router();
-
     app.get('/users', userController.findUsers);
 
-    // Authentication
-    app.post("/user/login", userController.loginUser);
+    app.get('/user/:username', userController.findOneUser);
 
-    // Registration
-    app.post("/user/register", userController.registerUser);
+    app.post('/user/:username/album/:name', userController.addCardToAlbum);
+
+    app.post('/user/:username/albumAddRandom', userController.randomCardToAlbum);
+
+    app.post('/user/:username/deck/:name', userController.addCardToDeck);
+
+    app.delete('/user/:username/deck/:name', userController.removeCardFromDeck);
 }

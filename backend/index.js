@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // Configuring the database
-const dbConfig = require('./config/db/db.users');
+const dbConfig = require('./config/db');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
@@ -33,8 +33,8 @@ app.use((req, res, next) => {
 })
 
 require('./app/routes/user.routes')(app);
-// app.use("/", userRouter);
-// app.use(require("./app/routes/sanke.routes"));
+require('./app/routes/card.routes')(app);
+require('./app/routes/auth.routes')(app);
 
 app.get("/", function (_req, res) {
     return res.send("El servidor esta funcionando");
