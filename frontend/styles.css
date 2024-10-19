@@ -1,4 +1,8 @@
-.card-grid {
+body {
+    background: url("https://pokeflip.com/cdn/shop/articles/Ontwerp_zonder_titel_-_2021-06-23T174108.270.jpg?v=1715009318");
+}
+
+/* .card-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
@@ -54,4 +58,4 @@
 .card-info p {
     margin: 4px 0;
     font-size: 14px;
-}
+} */
