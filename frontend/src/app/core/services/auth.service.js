@@ -7,7 +7,7 @@ class AuthService {
     }
 
     async register(body) {
-        return await apiService.post('/user/login', body);
+        return await apiService.post('/user/register', body);
     }
 }
 
