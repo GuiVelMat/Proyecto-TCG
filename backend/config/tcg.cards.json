@@ -54,8 +54,7 @@
     "updatedAt": {
       "$date": "2024-10-17T23:56:15.672Z"
     },
-    "__v": 0,
-    "quantity": 5
+    "__v": 0
   },
   {
     "_id": {
@@ -67,7 +66,6 @@
     "type": "grass",
     "rarity": "uncommon",
     "image": "Grotle.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:33:26.948Z"
@@ -87,7 +85,6 @@
     "type": "fire",
     "rarity": "uncommon",
     "image": "Braixen.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:33:43.737Z"
@@ -107,7 +104,6 @@
     "type": "water",
     "rarity": "uncommon",
     "image": "Marshtomp.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:34:05.899Z"
@@ -127,7 +123,6 @@
     "type": "grass",
     "rarity": "rare",
     "image": "Torterra.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:34:24.826Z"
@@ -147,7 +142,6 @@
     "type": "fire",
     "rarity": "rare",
     "image": "Delphox.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:34:56.778Z"
@@ -167,7 +161,6 @@
     "type": "water",
     "rarity": "rare",
     "image": "Swampert.png",
-    "quantity": 1,
     "isMana": false,
     "createdAt": {
       "$date": "2024-10-18T01:34:37.918Z"
@@ -187,7 +180,6 @@
     "type": "mana",
     "rarity": "common",
     "image": "basic_mana.png",
-    "quantity": 1,
     "isMana": true,
     "createdAt": {
       "$date": "2024-10-18T01:36:57.576Z"
@@ -207,7 +199,6 @@
     "type": "mana",
     "rarity": "uncommon",
     "image": "super_mana.png",
-    "quantity": 1,
     "isMana": true,
     "createdAt": {
       "$date": "2024-10-18T01:37:44.967Z"
@@ -227,7 +218,6 @@
     "type": "mana",
     "rarity": "rare",
     "image": "ultra_mana.png",
-    "quantity": 1,
     "isMana": true,
     "createdAt": {
       "$date": "2024-10-18T01:38:01.156Z"

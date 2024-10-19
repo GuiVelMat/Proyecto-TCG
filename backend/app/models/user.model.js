@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
     }],
     activeCard: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Card'
+        ref: 'Card',
+        default: "67117e3ee3b7b4ab0a19a30e"
     }
 }, {
     timestamps: true
@@ -34,7 +35,7 @@ userSchema.methods.toUserResponse = function () {
     };
 };
 
-userSchema.methods.toUserCompleteResponse = function (deck, album) {
+userSchema.methods.toUserCompleteResponse = function (deck, album, activeCard) {
     return {
         username: this.username,
         credits: this.credits,
@@ -42,7 +43,7 @@ userSchema.methods.toUserCompleteResponse = function (deck, album) {
         isFoilActive: this.isFoilActive,
         deck: deck,
         album: album,
-        activeCard: this.activeCard
+        activeCard: activeCard
     };
 }
 
