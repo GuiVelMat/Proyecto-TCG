@@ -93,12 +93,27 @@ exports.addCardToDeck = async (req, res) => {
             await user.save();
 
             res.status(200).json({ message: "Card added to deck", deck: user.deck });
-        } else {
-            res.status(200).json({ message: "Card already in deck!" });
         }
         res.status(200).json({ message: "Card added to deck", deck: user.deck });
     } catch (error) {
         res.status(500).json({ message: "Error adding card to deck", error: error.message });
+    }
+}
+
+exports.generateInitialDeck = async (username, req, res) => {
+    try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const basic_mana = await Card.findOne({ name: "Basic mana" });
+        const super_mana = await Card.findOne({ name: "Super mana" });
+
+        user.deck.push(basic_mana._id, basic_mana._id, basic_mana._id, super_mana._id);
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Error adding card to album", error: error.message });
     }
 }
 

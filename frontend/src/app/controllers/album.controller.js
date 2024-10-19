@@ -1,4 +1,5 @@
 import CardService from "../core/services/card.service.js";
+import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 
 const loadAlbum = async () => {
@@ -15,7 +16,7 @@ const loadAlbum = async () => {
 const loadAlbumUser = async () => {
     try {
         const username = getCurrentUser();
-        const cards = await CardService.getCardListUser(username);
+        const cards = await UserService.getAlbumUser(username);
         // console.log(cards);
 
         const cardCount = {};  // Objeto para almacenar el conteo de cada carta

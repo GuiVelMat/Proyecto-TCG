@@ -34,6 +34,7 @@ exports.registerUser = async (req, res) => {
     const createdUser = await User.create(newUser);
 
     userController.generateInitialAlbum(createdUser.username);
+    userController.generateInitialDeck(createdUser.username);
 
     if (createdUser) {
         res.status(201).json({ user: createdUser.toUserResponse() });
