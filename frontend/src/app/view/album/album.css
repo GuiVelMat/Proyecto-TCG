@@ -12,6 +12,14 @@ body {
     padding: 16px;
 }
 
+.card-container {
+    transition: transform 0.2s;
+}
+
+.card-container:hover {
+    transform: scale(1.05);
+}
+
 .card {
     background-color: #6e4141;
     border: 15px solid gold;
@@ -20,23 +28,6 @@ body {
     overflow: hidden;
     width: 300px;
     margin: 70px;
-    transition: transform 0.2s;
-}
-
-.locked-card {
-    background-color: #6e4141;
-    border: 15px solid gold;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    width: 350px;
-    margin: 50px;
-    transition: transform 0.2s;
-    filter: grayscale(100%);
-}
-
-.card:hover {
-    transform: scale(1.05);
 }
 
 .card-title {
@@ -114,4 +105,19 @@ body {
 .go-back:hover {
     background-color: gold;
     color: #fff;
+}
+
+.card-count {
+    background-color: #6e4141;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 5px solid white;
+    border-radius: 50%;
 }
