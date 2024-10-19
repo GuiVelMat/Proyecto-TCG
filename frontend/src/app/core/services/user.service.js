@@ -34,6 +34,12 @@ class UserService {
         return cardListUser.user.deck;
     }
 
+    // ACTIVE CARD SERVICES
+    async getActiveCardUser(username) {
+        const cardListUser = await apiService.get(`/user/${username}`);
+        return cardListUser.user.activeCard[0];
+    }
+
 }
 
 export default new UserService(); 
