@@ -110,7 +110,11 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
     return cardQuantity;
 }
 
-const attachCardClickEvents = (cardQuantity) => {
+const attachCardClickEvents = async (cardQuantity) => {
+    const username = getCurrentUser();
+    // console.log(await UserService.addCardToDeckUser(username, "Basic mana"));
+
+
     document.querySelectorAll('.card-container').forEach((container, index) => {
         container.addEventListener('click', () => {
             const cardName = container.querySelector('.card-name').textContent;
@@ -124,20 +128,23 @@ const attachCardClickEvents = (cardQuantity) => {
                         showCancelButton: true,
                         confirmButtonText: 'Confirm',
                         cancelButtonText: 'Cancel',
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
-                            // document.querySelector('.deck-power').innerHTML = `Deck power ${cardQuantity[index].quantity} / 12`;
+                            await UserService.addCardToDeckUser(username, cardName);
+                            calculateDeckPower();
                         }
                     });
+
                 } else { // if card is not mana
                     Swal.fire({
                         title: `Set ${cardName} as active card?`,
                         showCancelButton: true,
                         confirmButtonText: 'Confirm',
                         cancelButtonText: 'Cancel',
-                    }).then((result) => {
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
-                            // document.querySelector('.deck-power').innerHTML = `Deck power 1 / 12`;
+                            await UserService.addCardToDeckUser(username, cardName);
+                            calculateDeckPower();
                         }
                     });
                 }
@@ -146,12 +153,34 @@ const attachCardClickEvents = (cardQuantity) => {
     });
 }
 
+const calculateDeckPower = async () => {
+    try {
+        const username = getCurrentUser();
+        const userDeck = await UserService.getDeckUser(username);
+        const activeCard = await UserService.getActiveCardUser(username);
+        let totalPower = 0;
+
+        userDeck.forEach(card => {
+            // console.log(card.power);
+            totalPower += card.power;
+        });
+
+        totalPower += activeCard.power;
+
+        document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
+        return totalPower;
+    } catch (error) {
+        console.error('Error calculating deck power:', error);
+    }
+}
+
 
 const onInit = async () => {
     try {
         const allCards = await loadAlbum(); // Todas las cartas
         const userCards = await loadAlbumUser(); // Cartas del usuario
         renderCardsAlbum(allCards, userCards.cards, userCards.cardCount);
+        calculateDeckPower();
     } catch (error) {
         console.error('Error initializing album:', error);
     }

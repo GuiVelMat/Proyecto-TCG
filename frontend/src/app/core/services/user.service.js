@@ -25,13 +25,14 @@ class UserService {
     }
 
     async addCardToDeckUser(username, cardName) {
+        // return `/user/${username}/deck/${cardName}`;
         const cardListUser = await apiService.post(`/user/${username}/deck/${cardName}`);
-        return cardListUser.user.deck;
+        return cardListUser.deck;
     }
 
     async removeCardFromDeckUser(username, cardName) {
         const cardListUser = await apiService.delete(`/user/${username}/deck/${cardName}`);
-        return cardListUser.user.deck;
+        return cardListUser.deck;
     }
 
     // ACTIVE CARD SERVICES
