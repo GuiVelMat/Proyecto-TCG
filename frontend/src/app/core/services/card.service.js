@@ -7,6 +7,11 @@ class CardService {
         return cardList.cards;
     }
 
+    async getCardListUser(username) {
+        const cardListUser = await apiService.get(`/user/${username}`);
+        return cardListUser.user.album;
+    }
+
     async getOneCard(cardName) {
         return await apiService.get(`/card/${cardName}`);
     }

@@ -1,9 +1,22 @@
 import CardService from "../core/services/card.service.js";
+import { getCurrentUser } from "./auth.controller.js";
 
 const loadAlbum = async () => {
     try {
         const cards = await CardService.getCardList();
-        console.log(cards);
+        // console.log(cards);
+
+        return cards;
+    } catch (error) {
+        console.error('Error loading cards:', error);
+    }
+}
+
+const loadAlbumUser = async () => {
+    try {
+        const username = getCurrentUser();
+        const cards = await CardService.getCardListUser(username);
+        // console.log(cards);
 
         return cards;
     } catch (error) {
@@ -21,10 +34,14 @@ const loadRandomCard = async () => {
     }
 }
 
-const renderCards = (cards) => {
+const renderCards = (cards, userCards) => {
     const cardGrid = document.querySelector('.card-grid');
-    cardGrid.innerHTML = ''; // Clear any existing cards
+    cardGrid.innerHTML = '';
 
+    // Mapeo de cartas del usuario para fácil búsqueda, sólo necesitamos el nombre para hacer el check
+    const userCardMap = new Map(userCards.map(card => [card.name]));
+
+    // Crear todas las cartas del album
     cards.forEach(card => {
         const urlImg = `${window.location.origin}/src/assets/${card.image}`;
 
@@ -45,6 +62,7 @@ const renderCards = (cards) => {
             </div>
         `;
 
+        // Colorear según tipo de carta
         switch (card.type) {
             case 'fire':
                 renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
@@ -59,14 +77,23 @@ const renderCards = (cards) => {
                 renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
         }
 
+        // Si la carta no está en el álbum del usuario, aplicar blanco y negro
+        if (!userCardMap.has(card.name)) {
+            renderedCard.style.filter = 'grayscale(100%)';
+        }
+
         cardGrid.appendChild(renderedCard);
     });
 }
 
-loadAlbum().then(cards => renderCards(cards));
+const init = async () => {
+    try {
+        const allCards = await loadAlbum(); // Todas las cartas
+        const userCards = await loadAlbumUser(); // Cartas del usuario
+        renderCards(allCards, userCards);
+    } catch (error) {
+        console.error('Error initializing album:', error);
+    }
+}
 
-export default {
-    loadAlbum,
-    loadRandomCard,
-    renderCards
-};
+init();
