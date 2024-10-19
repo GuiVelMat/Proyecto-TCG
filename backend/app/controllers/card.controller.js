@@ -57,7 +57,7 @@ exports.getRandomCardFromAlbum = async (req, res) => {
 
         const randomCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
 
-        return randomCard.toCardResponse();
+        return res.json(randomCard.toCardResponse());
     } catch (error) {
         res.status(500).json({ message: "Error retrieving random card", error: error.message });
     }

@@ -1,4 +1,5 @@
 const User = require('../models/user.model');
+const userController = require('../controllers/user.controller.js');
 
 exports.loginUser = async (req, res) => {
     const user = req.body;
@@ -21,17 +22,18 @@ exports.loginUser = async (req, res) => {
 exports.registerUser = async (req, res) => {
     const user = req.body;
 
-    if (!user || !user.email || !user.username || !user.password) {
+    if (!user || !user.username || !user.password) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     const newUser = {
         username: user.username,
         password: user.password,
-        email: user.email,
     };
 
     const createdUser = await User.create(newUser);
+
+    userController.generateInitialAlbum(createdUser.username);
 
     if (createdUser) {
         res.status(201).json({ user: createdUser.toUserResponse() });

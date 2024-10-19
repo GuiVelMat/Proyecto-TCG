@@ -21,21 +21,32 @@ exports.findUsers = async (req, res) => {
     }
 };
 
-
 exports.findOneUser = async (req, res) => {
     try {
         const user = await User.findOne({ username: req.params.username }).exec();
-        const deck = await Card.find({ _id: { $in: user.deck } }).exec();
-        const album = await Card.find({ _id: { $in: user.album } }).exec();
-
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.status(200).json({ user: user.toUserCompleteResponse(deck, album) });
+
+        // Fetch all cards for the deck and album
+        const deckCards = await Card.find({ _id: { $in: user.deck } }).exec();
+        const albumCards = await Card.find({ _id: { $in: user.album } }).exec();
+
+        // Create a card map for quick access
+        const cardMap = {};
+        albumCards.forEach(card => {
+            cardMap[card._id] = card; // Store each card by its ID
+        });
+
+        const userDeck = user.deck.map(cardId => cardMap[cardId]);
+        const userAlbum = user.album.map(cardId => cardMap[cardId]);
+
+        res.status(200).json({ user: user.toUserCompleteResponse(userDeck, userAlbum) });
     } catch (error) {
+        console.error(error); // Log error for debugging
         res.status(500).json({ message: "Error retrieving user", error: error.message });
     }
-}
+};
 
 exports.addCardToAlbum = async (req, res) => {
     try {
@@ -91,6 +102,26 @@ exports.addCardToDeck = async (req, res) => {
     }
 }
 
+exports.generateInitialAlbum = async (username, req, res) => {
+    try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const fennekin = await Card.findOne({ name: "Fennekin" });
+        const mudkip = await Card.findOne({ name: "Mudkip" });
+        const turtwig = await Card.findOne({ name: "Turtwig" });
+        const basic_mana = await Card.findOne({ name: "Basic mana" });
+        const super_mana = await Card.findOne({ name: "Super mana" });
+
+        user.album.push(fennekin._id, mudkip._id, turtwig._id, basic_mana._id, basic_mana._id, basic_mana._id, super_mana._id);
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Error adding card to album", error: error.message });
+    }
+}
+
 exports.removeCardFromDeck = async (req, res) => {
     try {
         const { username, name } = req.params;
@@ -111,7 +142,6 @@ exports.removeCardFromDeck = async (req, res) => {
 }
 
 exports.randomCardToAlbum = async (req, res) => {
-    // return res.json("hola")
     try {
         const { username } = req.params;
 
