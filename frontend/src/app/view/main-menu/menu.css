@@ -42,3 +42,7 @@ a {
 a:hover {
     background-color: #ff4500;
 }
+
+#logout-button:hover {
+    cursor: pointer;
+}
