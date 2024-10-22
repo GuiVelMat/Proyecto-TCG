@@ -117,6 +117,8 @@ const renderActiveCard = (activeCard) => {
 }
 
 const attachDeckCardClickEvents = () => {
+    const username = getCurrentUser();
+
     document.querySelector('.active-card-container').addEventListener('click', () => {
         const cardName = document.querySelector('.active-card-container .card-name').textContent;
 
@@ -141,9 +143,11 @@ const attachDeckCardClickEvents = () => {
                 showCancelButton: true,
                 confirmButtonText: 'Confirm',
                 cancelButtonText: 'Cancel',
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
-                    // Logic to remove card from deck
+                    console.log(`Adding ${cardName} to deck`);
+                    await UserService.removeCardFromDeckUser(username, cardName);
+                    window.location.reload();
                 }
             });
 

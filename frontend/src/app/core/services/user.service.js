@@ -25,7 +25,6 @@ class UserService {
     }
 
     async addCardToDeckUser(username, cardName) {
-        // return `/user/${username}/deck/${cardName}`;
         const cardListUser = await apiService.post(`/user/${username}/deck/${cardName}`);
         return cardListUser.deck;
     }

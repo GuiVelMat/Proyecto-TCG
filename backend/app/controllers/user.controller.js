@@ -164,25 +164,6 @@ exports.removeCardFromDeck = async (req, res) => {
     }
 };
 
-// exports.removeCardFromDeck = async (req, res) => {
-//     try {
-//         const { username, name } = req.params;
-
-//         const user = await User.findOne({ username: username })
-//         if (!user) {
-//             return res.status(404).json({ message: "User not found" });
-//         }
-
-//         const card = await Card.findOne({ name: name });
-//         user.deck.pull(card._id);
-//         await user.save();
-
-//         res.status(200).json({ message: "Card removed from deck", deck: user.deck });
-//     } catch (error) {
-//         res.status(500).json({ message: "Error removing card from deck", error: error.message });
-//     }
-// }
-
 exports.randomCardToAlbum = async (req, res) => {
     try {
         const { username } = req.params;
