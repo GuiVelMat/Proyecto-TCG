@@ -130,8 +130,19 @@ const attachCardClickEvents = async (cardQuantity) => {
                         cancelButtonText: 'Cancel',
                     }).then(async (result) => {
                         if (result.isConfirmed) {
-                            await UserService.addCardToDeckUser(username, cardName);
-                            calculateDeckPower();
+                            calculateDeckPower(cardName).then(async (response) => {
+                                if (response === "exceeded") {
+                                    console.log(`Deck Power limit exceeded!`);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Deck power limit exceeded!',
+                                    });
+                                } else {
+                                    console.log(`Adding ${cardName} to deck`);
+                                    await UserService.addCardToDeckUser(username, cardName);
+                                }
+                            });
                         }
                     });
 
@@ -143,8 +154,19 @@ const attachCardClickEvents = async (cardQuantity) => {
                         cancelButtonText: 'Cancel',
                     }).then(async (result) => {
                         if (result.isConfirmed) {
-                            await UserService.setActiveCardUser(username, cardName);
-                            calculateDeckPower();
+                            calculateDeckPower(cardName).then(async (response) => {
+                                if (response === "exceeded") {
+                                    console.log(`Deck Power limit exceeded!`);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: 'Deck power limit exceeded!',
+                                    });
+                                } else {
+                                    console.log(`Setting ${cardName} as active card`);
+                                    await UserService.setActiveCardUser(username, cardName);
+                                }
+                            });
                         }
                     });
                 }
@@ -153,11 +175,12 @@ const attachCardClickEvents = async (cardQuantity) => {
     });
 }
 
-const calculateDeckPower = async () => {
+const calculateDeckPower = async (newCard) => {
     try {
         const username = getCurrentUser();
         const userDeck = await UserService.getDeckUser(username);
         const activeCard = await UserService.getActiveCardUser(username);
+
         let totalPower = 0;
 
         userDeck.forEach(card => {
@@ -166,6 +189,19 @@ const calculateDeckPower = async () => {
         });
 
         totalPower += activeCard.power;
+
+        if (newCard) {
+            const newCardPower = await CardService.getOneCard(newCard);
+
+            if (newCardPower.power + totalPower > 12) {
+                console.log(`Deck Power ${totalPower} / 12`);
+                return "exceeded";
+            } else {
+                totalPower += newCardPower.power;
+                document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
+                return totalPower;
+            }
+        }
 
         document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
         return totalPower;

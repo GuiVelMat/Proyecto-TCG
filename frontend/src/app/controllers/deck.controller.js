@@ -158,8 +158,6 @@ const calculateDeckPower = async () => {
         const activeCard = await UserService.getActiveCardUser(username);
         let totalPower = 0;
 
-        console.log(userDeck);
-
         userDeck.forEach(card => {
             console.log(card.power);
             totalPower += card.power;
