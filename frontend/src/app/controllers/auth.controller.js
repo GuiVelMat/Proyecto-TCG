@@ -5,6 +5,8 @@ const login = async (userData) => {
         const response = await AuthService.login(userData);
         console.log('Login response:', response);
 
+        // borrarlo por si se salió de la página sin logout
+        localStorage.removeItem('username');
         localStorage.setItem('username', userData.username);
         window.location.href = '../main-menu/menu.html';
     } catch (error) {
@@ -17,6 +19,8 @@ const register = async (userData) => {
         const response = await AuthService.register(userData);
         console.log('Register response:', response);
 
+        // borrarlo por si se salió de la página sin logout
+        localStorage.removeItem('username');
         localStorage.setItem('username', userData.username);
         window.location.href = '../main-menu/menu.html';
     } catch (error) {

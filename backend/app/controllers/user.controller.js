@@ -10,8 +10,9 @@ exports.findUsers = async (req, res) => {
             // Fetch the deck and album for each user
             const deck = await Card.find({ _id: { $in: user.deck } }).exec();
             const album = await Card.find({ _id: { $in: user.album } }).exec();
+            const activeCard = await Card.find({ _id: { $in: user.activeCard } }).exec();
 
-            return user.toUserCompleteResponse(deck, album);
+            return user.toUserCompleteResponse(deck, album, activeCard);
         }));
 
         // Send back the formatted user responses
@@ -31,6 +32,7 @@ exports.findOneUser = async (req, res) => {
         // Fetch all cards for the deck and album
         const deckCards = await Card.find({ _id: { $in: user.deck } }).exec();
         const albumCards = await Card.find({ _id: { $in: user.album } }).exec();
+        const activeCard = await Card.find({ _id: { $in: user.activeCard } }).exec();
 
         // Create a card map for quick access
         const cardMap = {};
@@ -41,7 +43,7 @@ exports.findOneUser = async (req, res) => {
         const userDeck = user.deck.map(cardId => cardMap[cardId]);
         const userAlbum = user.album.map(cardId => cardMap[cardId]);
 
-        res.status(200).json({ user: user.toUserCompleteResponse(userDeck, userAlbum) });
+        res.status(200).json({ user: user.toUserCompleteResponse(userDeck, userAlbum, activeCard) });
     } catch (error) {
         console.error(error); // Log error for debugging
         res.status(500).json({ message: "Error retrieving user", error: error.message });
@@ -93,12 +95,27 @@ exports.addCardToDeck = async (req, res) => {
             await user.save();
 
             res.status(200).json({ message: "Card added to deck", deck: user.deck });
-        } else {
-            res.status(200).json({ message: "Card already in deck!" });
         }
         res.status(200).json({ message: "Card added to deck", deck: user.deck });
     } catch (error) {
         res.status(500).json({ message: "Error adding card to deck", error: error.message });
+    }
+}
+
+exports.generateInitialDeck = async (username, req, res) => {
+    try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const basic_mana = await Card.findOne({ name: "Basic mana" });
+        const super_mana = await Card.findOne({ name: "Super mana" });
+
+        user.deck.push(basic_mana._id, basic_mana._id, basic_mana._id, super_mana._id);
+        await user.save();
+    } catch (error) {
+        res.status(500).json({ message: "Error adding card to album", error: error.message });
     }
 }
 
