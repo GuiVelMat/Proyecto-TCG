@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 
 const corsOptions = {
-    origin: "http://192.168.1.41:8080",
+    origin: "http://192.168.56.1:8080",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200
@@ -33,13 +33,6 @@ mongoose.connect(dbConfig.url, {})
         console.log('Could not connect to the database. Exiting now...', err);
         process.exit();
     });
-
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
-//     res.setHeader('Access-Control-Allow-Methods', 'Content-Type', 'Authorization');
-//     next();
-// })
 
 require('./app/routes/user.routes')(app);
 require('./app/routes/card.routes')(app);

@@ -143,7 +143,7 @@ const attachCardClickEvents = async (cardQuantity) => {
                         cancelButtonText: 'Cancel',
                     }).then(async (result) => {
                         if (result.isConfirmed) {
-                            await UserService.addCardToDeckUser(username, cardName);
+                            await UserService.setActiveCardUser(username, cardName);
                             calculateDeckPower();
                         }
                     });

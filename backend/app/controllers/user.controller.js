@@ -176,3 +176,23 @@ exports.randomCardToAlbum = async (req, res) => {
         res.status(500).json({ message: "Error adding card to album", error: error.message });
     }
 }
+
+exports.setActiveCard = async (req, res) => {
+    try {
+        const { username, name } = req.params;
+
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const card = await Card.findOne({ name: name });
+        user.activeCard = card._id;
+        await user.save();
+
+        res.status(200).json({ message: "Active card set", activeCard: user.activeCard });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error setting active card", error: error.message });
+    }
+}

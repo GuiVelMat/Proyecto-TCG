@@ -41,6 +41,11 @@ class UserService {
         return cardListUser.user.activeCard[0];
     }
 
+    async setActiveCardUser(username, cardName) {
+        const cardListUser = await apiService.put(`/user/${username}/activeCard/${cardName}`);
+        return cardListUser;
+    }
+
 }
 
 export default new UserService(); 
