@@ -90,12 +90,6 @@ exports.addCardToDeck = async (req, res) => {
         user.deck.push(card._id);
         await user.save();
 
-        if (!user.deck.includes(card._id)) {
-            user.deck.push(card._id);
-            await user.save();
-
-            res.status(200).json({ message: "Card added to deck", deck: user.deck });
-        }
         res.status(200).json({ message: "Card added to deck", deck: user.deck });
     } catch (error) {
         res.status(500).json({ message: "Error adding card to deck", error: error.message });
@@ -143,20 +137,51 @@ exports.removeCardFromDeck = async (req, res) => {
     try {
         const { username, name } = req.params;
 
-        const user = await User.findOne({ username: username })
+        const user = await User.findOne({ username: username });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
         const card = await Card.findOne({ name: name });
-        user.deck.pull(card._id);
+        if (!card) {
+            return res.status(404).json({ message: "Card not found" });
+        }
+
+        // Find the index of the first occurrence of the card's ObjectId in the user's deck
+        const cardIndex = user.deck.indexOf(card._id);
+
+        if (cardIndex === -1) {
+            return res.status(400).json({ message: "Card not in deck" });
+        }
+
+        // Remove only one instance of the card from the user's deck
+        user.deck.splice(cardIndex, 1);
         await user.save();
 
         res.status(200).json({ message: "Card removed from deck", deck: user.deck });
     } catch (error) {
         res.status(500).json({ message: "Error removing card from deck", error: error.message });
     }
-}
+};
+
+// exports.removeCardFromDeck = async (req, res) => {
+//     try {
+//         const { username, name } = req.params;
+
+//         const user = await User.findOne({ username: username })
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+
+//         const card = await Card.findOne({ name: name });
+//         user.deck.pull(card._id);
+//         await user.save();
+
+//         res.status(200).json({ message: "Card removed from deck", deck: user.deck });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error removing card from deck", error: error.message });
+//     }
+// }
 
 exports.randomCardToAlbum = async (req, res) => {
     try {
