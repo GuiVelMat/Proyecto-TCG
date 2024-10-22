@@ -193,14 +193,18 @@ const calculateDeckPower = async (newCard) => {
         if (newCard) {
             const newCardPower = await CardService.getOneCard(newCard);
 
+            // new card is activeCard
+            if (newCardPower.isMana == false && activeCard.power === newCardPower.power) {
+                console.log(`Card ${newCard} is already active`);
+                return "active";
+            }
+            // new card is mana
             if (newCardPower.power + totalPower > 12) {
                 console.log(`Deck Power ${totalPower} / 12`);
                 return "exceeded";
-            } else {
-                totalPower += newCardPower.power;
-                document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
-                return totalPower;
             }
+
+            totalPower += newCardPower.power;
         }
 
         document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
