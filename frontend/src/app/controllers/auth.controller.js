@@ -46,7 +46,8 @@ const handleButtonClick = async (event) => {
 
     const buttonId = event.target.id;
 
-    if (buttonId === 'login-button') {
+    // Para que funcione con enter y click
+    if (buttonId === 'login-button' || (buttonId === 'username' || buttonId === 'password')) {
         try {
             await login(userData);
         } catch (error) {
@@ -65,6 +66,9 @@ const handleButtonClick = async (event) => {
 document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-button');
     const registerButton = document.getElementById('register-button');
+    // necesarios para el trackeo del keydown
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
 
     if (loginButton) {
         loginButton.addEventListener('click', handleButtonClick);
@@ -72,5 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (registerButton) {
         registerButton.addEventListener('click', handleButtonClick);
+    }
+
+    if (usernameInput) {
+        usernameInput.addEventListener('keydown', handleButtonClick);
+    }
+
+    if (passwordInput) {
+        passwordInput.addEventListener('keydown', handleButtonClick);
     }
 });

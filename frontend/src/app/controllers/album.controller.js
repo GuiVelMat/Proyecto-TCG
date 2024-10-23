@@ -41,7 +41,7 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
     const userCardSet = new Set(userCards.map(card => card.name));
     const cardQuantity = [];
 
-    // El fragment nos permite crear un guardado momentaneo de para usarlos luego.
+    // El fragment nos permite crear un guardado momentaneo de código para usarlo luego.
     // Esto hace que el código vaya más rápido y no tenga que pintar las cosas una por una.
     const fragment = document.createDocumentFragment();
 
