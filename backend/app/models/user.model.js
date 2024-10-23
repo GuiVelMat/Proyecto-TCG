@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    email: { type: String, required: true },
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     credits: { type: Number, default: 0 },
@@ -16,6 +15,11 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Card'
     }],
+    activeCard: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Card',
+        default: "67117e3ee3b7b4ab0a19a30e"
+    }
 }, {
     timestamps: true
 });
@@ -23,13 +27,25 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.toUserResponse = function () {
     return {
         username: this.username,
-        email: this.email,
         credits: this.credits,
         boughtFoil: this.boughtFoil,
         isFoilActive: this.isFoilActive,
-        // deck: this.deck,
-        // album: this.collection,
+        album: this.album,
+        deck: this.deck
     };
 };
+
+userSchema.methods.toUserCompleteResponse = function (deck, album, activeCard) {
+    return {
+        username: this.username,
+        credits: this.credits,
+        boughtFoil: this.boughtFoil,
+        isFoilActive: this.isFoilActive,
+        deck: deck,
+        album: album,
+        activeCard: activeCard
+    };
+}
+
 
 module.exports = mongoose.model('User', userSchema);

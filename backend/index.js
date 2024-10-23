@@ -1,9 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const cors = require('cors');
 
 // create express app
 const app = express();
+
+const corsOptions = {
+    origin: "http://192.168.1.41:8080",
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -12,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
 // Configuring the database
-const dbConfig = require('./config/db/db.users');
+const dbConfig = require('./config/db');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
@@ -25,16 +34,9 @@ mongoose.connect(dbConfig.url, {})
         process.exit();
     });
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
-    res.setHeader('Access-Control-Allow-Methods', 'Content-Type', 'Authorization');
-    next();
-})
-
 require('./app/routes/user.routes')(app);
-// app.use("/", userRouter);
-// app.use(require("./app/routes/sanke.routes"));
+require('./app/routes/card.routes')(app);
+require('./app/routes/auth.routes')(app);
 
 app.get("/", function (_req, res) {
     return res.send("El servidor esta funcionando");
