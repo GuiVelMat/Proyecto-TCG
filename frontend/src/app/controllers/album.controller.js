@@ -37,64 +37,62 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
     const cardGrid = document.querySelector('.card-grid');
     cardGrid.innerHTML = '';
 
-    // Mapeo de cartas del usuario para fácil búsqueda, sólo necesitamos el nombre para hacer el check
-    const userCardMap = new Map(userCards.map(card => [card.name]));
+    // Mapeo de cartas del usuario para fácil búsqueda, solo necesitamos el nombre para hacer el check
+    const userCardSet = new Set(userCards.map(card => card.name));
     const cardQuantity = [];
 
+    // El fragment nos permite crear un guardado momentaneo de para usarlos luego.
+    // Esto hace que el código vaya más rápido y no tenga que pintar las cosas una por una.
+    const fragment = document.createDocumentFragment();
 
-    // Crear todas las cartas del album
     cards.forEach(card => {
         const urlImg = `${window.location.origin}/src/assets/${card.image}`;
         const count = cardCount[card.name] || 0;
         cardQuantity.push({ name: card.name, quantity: count });
 
         const renderedCard = document.createElement('div');
+        renderedCard.classList.add('card-container');
+
+        const backgroundColor = getCardColor(card.type);
+        const grayscale = !userCardSet.has(card.name) ? 'grayscale(100%)' : 'none';
+
         renderedCard.innerHTML = `
-            <div class="card-container">
-                <p class="card-count">${count}</p>
-                <div class="card" id="card">                
-                    <div class="card-title">
-                        <p class="card-name">${card.name}</p>
-                    </div>
-                    <div class="card-img">
-                        <img src="${urlImg}" alt="${card.name}" />
-                    </div>
-                    <div class="card-info">
-                        <p class="power">${card.power}</p>
-                        <p class="rarity">${card.rarity}</p>
-                        <p class="health">${card.health}</p>
-                    </div>
+            <p class="card-count">${count}</p>
+            <div class="card" style="background-color: ${backgroundColor}; filter: ${grayscale};">
+                <div class="card-title">
+                    <p class="card-name">${card.name}</p>
+                </div>
+                <div class="card-img">
+                    <img src="${urlImg}" alt="${card.name}" />
+                </div>
+                <div class="card-info">
+                    <p class="power">${card.power}</p>
+                    <p class="rarity">${card.rarity}</p>
+                    <p class="health">${card.health}</p>
                 </div>
             </div>
         `;
 
-        // Colorear según tipo de carta
-        switch (card.type) {
-            case 'fire':
-                renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
-                break;
-            case 'water':
-                renderedCard.querySelector('.card').style.backgroundColor = 'skyblue';
-                break;
-            case 'grass':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgreen';
-                break;
-            case 'mana':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
-        }
-
-        // Si la carta no está en el álbum del usuario, aplicar blanco y negro
-        if (!userCardMap.has(card.name)) {
-            const cardElement = renderedCard.querySelector('.card');
-            cardElement.style.filter = 'grayscale(100%)';
-        }
-
-        cardGrid.appendChild(renderedCard);
+        // Aquí es donde el fragment se va llenando con cada info del bucle
+        fragment.appendChild(renderedCard);
     });
 
-    // aquí llamamos a los eventListener
+    // Asignamos el fragment con todas las cartas a la grid de cartas
+    cardGrid.appendChild(fragment);
+
+    // Llamada a los event listeners
     attachCardClickEvents(cardQuantity);
-}
+};
+
+const getCardColor = (type) => {
+    switch (type) {
+        case 'fire': return 'tomato';
+        case 'water': return 'skyblue';
+        case 'grass': return 'lightgreen';
+        case 'mana': return 'lightgrey';
+        default: return 'white';
+    }
+};
 
 const attachCardClickEvents = async (cardQuantity) => {
     const username = getCurrentUser();
