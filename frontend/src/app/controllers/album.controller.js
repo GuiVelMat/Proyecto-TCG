@@ -4,9 +4,7 @@ import { getCurrentUser } from "./auth.controller.js";
 
 const loadAlbum = async () => {
     try {
-        const cards = await CardService.getCardList();
-
-        return cards;
+        return await CardService.getCardList();
     } catch (error) {
         console.error('Error loading cards:', error);
     }
@@ -50,27 +48,27 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
         const count = cardCount[card.name] || 0;
         cardQuantity.push({ name: card.name, quantity: count });
 
-        const renderedCard = document.createElement('div');
-        renderedCard.classList.add('card-container');
-
         const backgroundColor = getCardColor(card.type);
         const grayscale = !userCardSet.has(card.name) ? 'grayscale(100%)' : 'none';
 
+        const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
             <p class="card-count">${count}</p>
-            <div class="card" style="background-color: ${backgroundColor}; filter: ${grayscale};">
-                <div class="card-title">
-                    <p class="card-name">${card.name}</p>
+            <div class="card-container">
+                <div class="card" style="background-color: ${backgroundColor}; filter: ${grayscale};">
+                    <div class="card-title">
+                        <p class="card-name">${card.name}</p>
+                    </div>
+                    <div class="card-img">
+                        <img src="${urlImg}" alt="${card.name}" />
+                    </div>
+                    <div class="card-info">
+                        <p class="power">${card.power}</p>
+                        <p class="rarity">${card.rarity}</p>
+                        <p class="health">${card.health}</p>
+                    </div>
                 </div>
-                <div class="card-img">
-                    <img src="${urlImg}" alt="${card.name}" />
-                </div>
-                <div class="card-info">
-                    <p class="power">${card.power}</p>
-                    <p class="rarity">${card.rarity}</p>
-                    <p class="health">${card.health}</p>
-                </div>
-            </div>
+            </div>            
         `;
 
         // Aquí es donde el fragment se va llenando con cada info del bucle
@@ -84,7 +82,7 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
     attachCardClickEvents(cardQuantity);
 };
 
-const getCardColor = (type) => {
+export const getCardColor = (type) => {
     switch (type) {
         case 'fire': return 'tomato';
         case 'water': return 'skyblue';
@@ -141,7 +139,7 @@ const attachCardClickEvents = async (cardQuantity) => {
                     cancelButtonText: 'Cancel',
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        calculateDeckPower(cardName).then(async (response) => {
+                        calculateDeckPowerInAlbum(cardName).then(async (response) => {
                             if (response === "exceeded") {
                                 // console.log(`Deck Power limit exceeded!`);
                                 Swal.fire({
@@ -171,7 +169,7 @@ const attachCardClickEvents = async (cardQuantity) => {
     });
 }
 
-const calculateDeckPower = async (newCard) => {
+const calculateDeckPowerInAlbum = async (newCard) => {
     try {
         const username = getCurrentUser();
         const userDeck = await UserService.getDeckUser(username);
@@ -213,7 +211,7 @@ const onInit = async () => {
         const allCards = await loadAlbum(); // Todas las cartas
         const userCards = await loadAlbumUser(); // Cartas del usuario
         renderCardsAlbum(allCards, userCards.cards, userCards.cardCount);
-        calculateDeckPower();
+        calculateDeckPowerInAlbum();
     } catch (error) {
         console.error('Error initializing album:', error);
     }
