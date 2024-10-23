@@ -5,7 +5,6 @@ import { getCurrentUser } from "./auth.controller.js";
 const loadAlbum = async () => {
     try {
         const cards = await CardService.getCardList();
-        // console.log(cards);
 
         return cards;
     } catch (error) {
@@ -17,7 +16,6 @@ const loadAlbumUser = async () => {
     try {
         const username = getCurrentUser();
         const cards = await UserService.getAlbumUser(username);
-        // console.log(cards);
 
         const cardCount = {};  // Objeto para almacenar el conteo de cada carta
 
@@ -32,16 +30,6 @@ const loadAlbumUser = async () => {
         return { cards, cardCount };
     } catch (error) {
         console.error('Error loading cards:', error);
-    }
-}
-
-const loadRandomCard = async () => {
-    try {
-        const card = await CardService.getRandomCard();
-        console.log(card);
-        // Render the card in the UI
-    } catch (error) {
-        console.error('Error loading random card:', error);
     }
 }
 
@@ -104,72 +92,82 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
         cardGrid.appendChild(renderedCard);
     });
 
+    // aquí llamamos a los eventListener
     attachCardClickEvents(cardQuantity);
-
-    // hacemos return por si queremos usar el objeto de cartas y sus cantidades
-    return cardQuantity;
 }
 
 const attachCardClickEvents = async (cardQuantity) => {
     const username = getCurrentUser();
-    // console.log(await UserService.addCardToDeckUser(username, "Basic mana"));
+    const userDeck = await UserService.getDeckUser(username);
+    const cardsInDeck = {};
 
+    // Trackear el numero de cartas del deck
+    userDeck.forEach(card => {
+        if (cardsInDeck[card.name]) {
+            cardsInDeck[card.name]++;
+        } else {
+            cardsInDeck[card.name] = 1;
+        }
+    });
+
+    // console.log(cardsInDeck);
 
     document.querySelectorAll('.card-container').forEach((container, index) => {
         container.addEventListener('click', () => {
             const cardName = container.querySelector('.card-name').textContent;
 
-            // Access the card and its quantity using the current index
+            // Check de que tengas o no las cartas en el album
             if (cardQuantity[index].name === cardName && cardQuantity[index].quantity > 0) {
-                // check if card is Mana
-                if (cardName === "Basic mana" || cardName === "Super mana" || cardName === "Ultra mana") {
-                    Swal.fire({
-                        title: `Add ${cardName} to deck?`,
-                        showCancelButton: true,
-                        confirmButtonText: 'Confirm',
-                        cancelButtonText: 'Cancel',
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            calculateDeckPower(cardName).then(async (response) => {
-                                if (response === "exceeded") {
-                                    console.log(`Deck Power limit exceeded!`);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Deck power limit exceeded!',
-                                    });
-                                } else {
-                                    console.log(`Adding ${cardName} to deck`);
-                                    await UserService.addCardToDeckUser(username, cardName);
-                                }
-                            });
-                        }
-                    });
+                const isManaCard = (cardName === "Basic mana" || cardName === "Super mana" || cardName === "Ultra mana");
 
-                } else { // if card is not mana
-                    Swal.fire({
-                        title: `Set ${cardName} as active card?`,
-                        showCancelButton: true,
-                        confirmButtonText: 'Confirm',
-                        cancelButtonText: 'Cancel',
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            calculateDeckPower(cardName).then(async (response) => {
-                                if (response === "exceeded") {
-                                    console.log(`Deck Power limit exceeded!`);
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: 'Deck power limit exceeded!',
-                                    });
-                                } else {
-                                    console.log(`Setting ${cardName} as active card`);
-                                    await UserService.setActiveCardUser(username, cardName);
-                                }
-                            });
-                        }
-                    });
+                if (isManaCard) {
+                    const totalAvailable = cardQuantity[index].quantity;
+                    const inDeck = cardsInDeck[cardName] || 0;
+
+                    // Check copias de cada carta en album vs copias en deck
+                    if (inDeck >= totalAvailable) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: `You can't add more ${cardName} to your deck than you have in your album.`,
+                        });
+                        return; // Stop here, don't allow adding more cards
+                    }
                 }
+
+                // Logica con el swal2
+                Swal.fire({
+                    title: isManaCard ? `Add ${cardName} to deck?` : `Set ${cardName} as active card?`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        calculateDeckPower(cardName).then(async (response) => {
+                            if (response === "exceeded") {
+                                // console.log(`Deck Power limit exceeded!`);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'Deck power limit exceeded!',
+                                });
+                            } else {
+                                if (isManaCard) {
+                                    // console.log(`Adding ${cardName} to deck`);
+                                    await UserService.addCardToDeckUser(username, cardName);
+                                } else {
+                                    // console.log(`Setting ${cardName} as active card`);
+                                    await UserService.setActiveCardUser(username, cardName);
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: `${cardName} is your new active card!`
+                                    });
+                                }
+                                cardsInDeck[cardName] = (cardsInDeck[cardName] || 0) + 1;  // Suma para evitar hacer reload();
+                            }
+                        });
+                    }
+                });
             }
         });
     });
@@ -184,23 +182,21 @@ const calculateDeckPower = async (newCard) => {
         let totalPower = 0;
 
         userDeck.forEach(card => {
-            // console.log(card.power);
             totalPower += card.power;
         });
-
         totalPower += activeCard.power;
 
         if (newCard) {
             const newCardPower = await CardService.getOneCard(newCard);
 
-            // new card is activeCard
+            // newCard es la activeCard
             if (newCardPower.isMana == false && activeCard.power === newCardPower.power) {
-                console.log(`Card ${newCard} is already active`);
+                // console.log(`Card ${newCard} is already active`);
                 return "active";
             }
-            // new card is mana
+            // newCard es un mana
             if (newCardPower.power + totalPower > 12) {
-                console.log(`Deck Power ${totalPower} / 12`);
+                // console.log(`Deck Power ${totalPower} / 12`);
                 return "exceeded";
             }
 
@@ -213,7 +209,6 @@ const calculateDeckPower = async (newCard) => {
         console.error('Error calculating deck power:', error);
     }
 }
-
 
 const onInit = async () => {
     try {

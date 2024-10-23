@@ -120,17 +120,8 @@ const attachDeckCardClickEvents = () => {
     const username = getCurrentUser();
 
     document.querySelector('.active-card-container').addEventListener('click', () => {
-        const cardName = document.querySelector('.active-card-container .card-name').textContent;
-
         Swal.fire({
-            title: `Remove ${cardName} from active card?`,
-            showCancelButton: true,
-            confirmButtonText: 'Confirm',
-            cancelButtonText: 'Cancel',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Logic to remove active card
-            }
+            title: `You can only change your active card in the album!`,
         });
     });
 
