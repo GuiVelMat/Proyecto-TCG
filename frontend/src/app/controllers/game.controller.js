@@ -5,7 +5,7 @@ const renderActiveCardPlayer = async () => {
     const username = getCurrentUser();
     const activeCard = await UserService.getActiveCardUser(username);
 
-    console.log(activeCard);
+    // console.log(activeCard);
 
     const deckActive = document.querySelector('.active-card-container-player');
     deckActive.innerHTML = '';
@@ -40,7 +40,7 @@ const renderActiveCardCPU = async () => {
     const username = getCurrentUser();
     const activeCard = await UserService.getActiveCardUser(username);
 
-    console.log(activeCard);
+    // console.log(activeCard);
 
     const deckActive = document.querySelector('.active-card-container-cpu');
     deckActive.innerHTML = '';
@@ -68,7 +68,6 @@ const renderActiveCardCPU = async () => {
     `;
 
     deckActive.appendChild(renderedCard);
-    // attachDeckCardClickEvents();
 }
 
 const getCardColor = (type) => {
