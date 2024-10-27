@@ -138,7 +138,7 @@ const rightZone = {
         ctx.fillStyle = "#fff";
         ctx.font = "20px Arial";
         ctx.textAlign = "left";
-        ctx.fillText("Total Power: " + this.totalPower, this.x + 10, this.y + 30);
+        ctx.fillText("Mana Power: " + this.totalPower, this.x + 10, this.y + 30);
     }
 };
 
