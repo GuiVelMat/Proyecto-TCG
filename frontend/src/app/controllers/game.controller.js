@@ -1,3 +1,4 @@
+import cardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 
@@ -46,7 +47,8 @@ const renderActiveCardPlayer = async (getInfo) => {
 
 const renderActiveCardCPU = async (getInfo) => {
     const username = getCurrentUser();
-    const activeCard = await UserService.getActiveCardUser(username);
+    const activeCard = await cardService.getActiveCPURandom(1);
+    console.log(activeCard);
 
     if (getInfo) {
         return activeCard;
@@ -227,14 +229,32 @@ const resetGame = () => {
 }
 
 // Function to end the game
-const endGame = (winner) => {
+const endGame = async (winner) => {
     const title = winner === 'cpu' ? 'CPU Wins' : 'You Win!';
     const icon = winner === 'cpu' ? 'error' : 'success';
-
-    Swal.fire({ icon, title });
     clearInterval(timerInterval);
-    // resetGame();
+
+    const username = getCurrentUser();
+    const activeCard = await UserService.addRandomCardToAlbumUser(username);
+
+    Swal.fire({
+        icon: icon,
+        title: title,
+        text: 'What would you like to do next?',
+        showCancelButton: true,
+        confirmButtonText: 'Reset Game',
+        cancelButtonText: 'Return to Main Menu'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Reset game logic here
+            resetGame();
+        } else if (result.isDismissed) {
+            // Navigate to main menu
+            window.location.href = '../main-menu/menu.html';
+        }
+    });
 };
+
 
 
 // ===========================================================================

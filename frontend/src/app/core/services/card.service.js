@@ -14,6 +14,11 @@ class CardService {
     async getRandomCard() {
         return await apiService.get('/cardRandom');
     }
+
+    async getActiveCPURandom(power) {
+        const card = await apiService.post(`/cpuRandomActive/${power}`);
+        return card;
+    }
 }
 
 export default new CardService(); 
