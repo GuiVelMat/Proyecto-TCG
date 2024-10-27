@@ -170,41 +170,47 @@ const attachCardClickEvents = async (cardQuantity) => {
     });
 }
 
-const calculateDeckPowerInAlbum = async (newCard) => {
+
+
+const calculateDeckPowerInAlbum = async (newCardId) => {
     try {
         const username = getCurrentUser();
         const userDeck = await UserService.getDeckUser(username);
         const activeCard = await UserService.getActiveCardUser(username);
 
-        let totalPower = 0;
+        // Calculate the total power from the user's deck and the active card
+        let totalPower = userDeck.reduce((sum, card) => sum + card.power, activeCard.power);
+        console.log(`Total power before changes: ${totalPower}`);
 
-        userDeck.forEach(card => {
-            totalPower += card.power;
-        });
-        totalPower += activeCard.power;
+        if (newCardId) {
+            const newCard = await CardService.getOneCard(newCardId);
+            let newCardPower = newCard.power;
+            console.log(newCardPower);
 
-        if (newCard) {
-            const newCardPower = await CardService.getOneCard(newCard);
-
-            // newCard es la activeCard
-            if (newCardPower.isMana == false && activeCard.power === newCardPower.power) {
-                // console.log(`Card ${newCard} is already active`);
+            if (!newCard.isMana && activeCard.power >= newCardPower) {
+                totalPower += newCardPower - activeCard.power;
+                updateDeckPowerDisplay(totalPower);
                 return "active";
             }
-            // newCard es un mana
-            if (newCardPower.power + totalPower > 12) {
-                // console.log(`Deck Power ${totalPower} / 12`);
+
+            if (newCardPower - activeCard.power + totalPower > 12) {
+                console.log(`exceeded`);
                 return "exceeded";
             }
 
-            totalPower += newCardPower.power;
+            totalPower += newCardPower - activeCard.power;
+            console.log(`New card total power: ${totalPower}`);
         }
 
-        document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
+        updateDeckPowerDisplay(totalPower);
         return totalPower;
     } catch (error) {
         console.error('Error calculating deck power:', error);
     }
+}
+
+const updateDeckPowerDisplay = (totalPower) => {
+    document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
 }
 
 const onInit = async () => {
