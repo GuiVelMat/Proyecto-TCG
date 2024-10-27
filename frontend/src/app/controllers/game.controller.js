@@ -120,6 +120,7 @@ export const setRightZonePower = (power) => {
 let playerTurn = true; // Boolean to track if it's the player's turn
 let turnTimer = 15; // Turn time limit in seconds
 let timerInterval;  // Interval ID for the countdown
+let cpuAttackPower;
 
 // HTML elements
 const endTurnButton = document.createElement('button');
@@ -151,62 +152,90 @@ const stopTurnTimer = () => {
 
 const endTurn = async () => {
     stopTurnTimer();
-    const activePlayerCardPower = document.querySelector('.active-card-container-player .power');
-    const activePlayerCardHealth = document.querySelector('.active-card-container-player .health');
 
-    const activeCPUCardPower = document.querySelector('.active-card-container-cpu .power');
-    const activeCPUCardHealth = document.querySelector('.active-card-container-cpu .health');
+    // Get active card stats
+    const {
+        power: playerCardPower,
+        health: playerCardHealthElement
+    } = getActiveCardStats('.active-card-container-player');
+
+    const {
+        power: cpuCardPower,
+        health: cpuCardHealthElement
+    } = getActiveCardStats('.active-card-container-cpu');
 
     if (playerTurn) {
-        // Player's turn ends, apply damage to CPU
-        activeCPUCardHealth.textContent -= activePlayerCardPower.textContent;
-        activeCPUCardHealth.textContent = activeCPUCardHealth.textContent;
+        applyDamage(cpuCardHealthElement, playerCardPower);
 
-        // Check for CPU defeat
-        if (activeCPUCardHealth.textContent <= 0) {
-            alert("You win!");
-            resetGame();
-            return;
+        if (parseInt(cpuCardHealthElement.textContent, 10) <= 0) {
+            endGame('player');
+            return; // Exit early to prevent further execution
         }
 
         playerTurn = false; // Switch turn to CPU
         startCPUTurn();
     } else {
-        // CPU's turn ends, apply damage to Player
-        activePlayerCardHealth.textContent -= activeCPUCardPower.textContent;
-        activePlayerCardHealth.textContent = activePlayerCardHealth.textContent;
+        applyDamage(playerCardHealthElement, cpuAttackPower); // Use the global cpuAttackPower
 
-        // Check for Player defeat
-        if (activePlayerCardHealth.textContent <= 0) {
-            alert("CPU wins!");
-            resetGame();
-            return;
+        if (parseInt(playerCardHealthElement.textContent, 10) <= 0) {
+            endGame('cpu');
+            return; // Exit early to prevent further execution
         }
 
-        playerTurn = true; // Switch turn to player
+        playerTurn = true; // Switch turn back to player
         startTurnTimer(); // Restart the timer for player's turn
     }
-}
+};
 
-function startCPUTurn() {
-    // CPU turn logic
-    const cpuAttackPower = getCpuAttackPower();
+// Function to get the active card's power and health
+const getActiveCardStats = (containerSelector) => {
+    const powerElement = document.querySelector(`${containerSelector} .power`);
+    const healthElement = document.querySelector(`${containerSelector} .health`);
+    return {
+        power: parseInt(powerElement.textContent, 10), // Ensure it's a number
+        health: healthElement // Keep reference to the health element itself
+    };
+};
+
+const applyDamage = (healthElement, damage) => {
+    const currentHealth = parseInt(healthElement.textContent, 10);
+    healthElement.textContent = currentHealth - damage; // Update health
+};
+
+const startCPUTurn = () => {
+    cpuAttackPower = getCpuAttackPower(); // Store random CPU attack power globally
+    const cpuPower = document.querySelector(`.active-card-container-cpu .power`);
+
+    console.log(cpuPower);
+    cpuPower.textContent = cpuAttackPower; // Update CPU's displayed power
     setTimeout(() => {
-        endTurn();
-    }, 1 * 1000);
-}
+        endTurn(); // Call endTurn after 1 second
+    }, 1000); // CPU attack after a 1 second delay
+};
 
-const getCpuAttackPower = async () => {
-    const activeCPUCard = await renderActiveCardCPU('getInfo');
-    return activeCPUCard.power;
-}
+// Function to get a random CPU attack power between 1 and 4
+const getCpuAttackPower = () => {
+    return Math.floor(Math.random() * 3) + 1; // Generates a number between 1 and 4
+};
 
-function resetGame() {
+// Function to reset the game state
+const resetGame = () => {
     playerTurn = true;
     clearInterval(timerInterval);
     timerDisplay.innerText = `Time Left: ${turnTimer}s`;
     startTurnTimer(); // Restart game with timer
 }
+
+// Function to end the game
+const endGame = (winner) => {
+    const title = winner === 'cpu' ? 'CPU Wins' : 'You Win!';
+    const icon = winner === 'cpu' ? 'error' : 'success';
+
+    Swal.fire({ icon, title });
+    clearInterval(timerInterval);
+    // resetGame();
+};
+
 
 // ===========================================================================
 // Listeners
