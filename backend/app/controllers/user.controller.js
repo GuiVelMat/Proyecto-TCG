@@ -203,3 +203,24 @@ exports.setActiveCard = async (req, res) => {
         res.status(500).json({ message: "Error setting active card", error: error.message });
     }
 }
+
+exports.modifyCredits = async (req, res) => {
+    try {
+        const { username, quantity } = req.params;
+        const creditChange = Number(quantity);
+
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // return res.json(user.credits += creditChange);
+        user.credits += creditChange;
+        await user.save();
+
+        res.status(200).json({ message: "Credits updated", credits: user.credits });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error setting active card", error: error.message });
+    }
+}

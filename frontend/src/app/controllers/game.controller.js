@@ -287,7 +287,7 @@ const endGame = async (winner) => {
     if (winner === 'player') {
         const username = getCurrentUser();
         const activeCard = await UserService.addRandomCardToAlbumUser(username);
-        await UserService.addCredits(3);
+        await UserService.modifyCredits(username, 3);
         message = `${activeCard.name} has been added to your collection!`;
     }
 

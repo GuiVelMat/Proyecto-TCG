@@ -45,6 +45,13 @@ class UserService {
         return cardListUser;
     }
 
+    // CREDIT SERVICES
+
+    async modifyCredits(username, quantity) {
+        const userCredits = await apiService.put(`/user/${username}/credits/${quantity}`);
+        return userCredits.credits;
+    }
+
 }
 
 export default new UserService(); 

@@ -14,5 +14,7 @@ module.exports = (app) => {
 
     app.put('/user/:username/activeCard/:name', userController.setActiveCard);
 
+    app.put('/user/:username/credits/:quantity', userController.modifyCredits)
+
     app.delete('/user/:username/deck/:name', userController.removeCardFromDeck);
 }
