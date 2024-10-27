@@ -200,7 +200,7 @@ const endTurn = async () => {
 
         if (parseInt(cpuCardHealthElement.textContent, 10) <= 0) {
             endGame('player');
-            return; // Exit early to prevent further execution
+            // return; // Exit early to prevent further execution
         }
 
         playerTurn = false; // Switch turn to CPU
@@ -211,7 +211,7 @@ const endTurn = async () => {
 
         if (parseInt(playerCardHealthElement.textContent, 10) <= 0) {
             endGame('cpu');
-            return; // Exit early to prevent further execution
+            // return; // Exit early to prevent further execution
         }
 
         playerTurn = true; // Switch turn back to player
@@ -268,26 +268,32 @@ const resetGame = () => {
 
 // Function to end the game
 const endGame = async (winner) => {
+    clearInterval(timerInterval);
+    console.log(winner);
+
     const title = winner === 'cpu' ? 'CPU Wins' : 'You Win!';
     const icon = winner === 'cpu' ? 'error' : 'success';
-    clearInterval(timerInterval);
+    let message = '';
 
-    const username = getCurrentUser();
-    // const activeCard = await UserService.addRandomCardToAlbumUser(username);
+    // If player wins, add card to collection and include a message
+    if (winner === 'player') {
+        const username = getCurrentUser();
+        const activeCard = await UserService.addRandomCardToAlbumUser(username);
+        message = `${activeCard.name} has been added to your collection!`;
+    }
 
+    // Display results to the player
     Swal.fire({
-        icon: icon,
-        title: title,
-        text: 'What would you like to do next?',
+        icon,
+        title,
+        text: message,
         showCancelButton: true,
-        confirmButtonText: 'Reset Game',
+        confirmButtonText: 'Play again',
         cancelButtonText: 'Return to Main Menu'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Reset game logic here
             resetGame();
         } else if (result.isDismissed) {
-            // Navigate to main menu
             window.location.href = '../main-menu/menu.html';
         }
     });

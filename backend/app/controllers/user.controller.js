@@ -178,7 +178,7 @@ exports.randomCardToAlbum = async (req, res) => {
         user.album.push(card.id);
         await user.save();
 
-        res.status(200).json({ message: "Random Card added to album", album: user.album });
+        res.status(200).json({ message: "Random Card added to album", card: card });
     } catch (error) {
         res.status(500).json({ message: "Error adding card to album", error: error.message });
     }

@@ -14,8 +14,8 @@ class UserService {
     }
 
     async addRandomCardToAlbumUser(username) {
-        const cardListUser = await apiService.post(`/user/${username}/albumAddRandom`);
-        return cardListUser.user.album;
+        const newRandomCard = await apiService.post(`/user/${username}/albumAddRandom`);
+        return newRandomCard.card;
     }
 
     // DECK SERVICES
