@@ -1,6 +1,7 @@
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 import { getCardColor } from "./album.controller.js";
+import { getSelectedSkin } from "./user.controller.js";
 
 const loadDeckUser = async () => {
     try {
@@ -36,7 +37,7 @@ const renderDeck = (cards) => {
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
             <div class="card-container">
-                <div class="card" id="card" style="background-color: ${backgroundColor};">                
+                <div class="card ${getSelectedSkin()}" id="card" style="background-color: ${backgroundColor};">                
                     <div class="card-title">
                         <p class="card-name">${card.name}</p>
                     </div>
@@ -68,7 +69,7 @@ const renderActiveCard = (activeCard) => {
     const renderedCard = document.createElement('div');
     renderedCard.innerHTML = `
         <div class="active-card-container">
-            <div class="card" id="active-card" style="background-color: ${backgroundColor};">                
+            <div class="card ${getSelectedSkin()}" id="active-card" style="background-color: ${backgroundColor};">                
                 <div class="card-title">
                     <p class="card-name">${activeCard.name}</p>
                 </div>
@@ -126,7 +127,6 @@ const calculateDeckPower = async () => {
         let totalPower = 0;
 
         userDeck.forEach(card => {
-            console.log(card.power);
             totalPower += card.power;
         });
 

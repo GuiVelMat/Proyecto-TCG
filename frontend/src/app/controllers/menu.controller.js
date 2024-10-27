@@ -11,9 +11,17 @@ const printUsername = () => {
     document.getElementById('menu-deck').innerText = `${username}'s deck`;
 }
 
-
-
 // load functions on documentLoad
 document.addEventListener('DOMContentLoaded', () => {
     printUsername();
+});
+
+
+
+document.getElementById('skin').value = localStorage.getItem('selectedSkin');
+document.getElementById('skin').addEventListener('change', (event) => {
+    const skin = event.target.value;
+    console.log(`Selected skin: ${skin}`);
+    localStorage.setItem('selectedSkin', skin);
+    // applySkin();
 });

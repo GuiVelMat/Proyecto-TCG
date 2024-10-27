@@ -165,3 +165,100 @@ body {
     border: 5px solid white;
     border-radius: 50%;
 }
+
+/* Add more styles for other skins */
+.skin-black {
+    border: 15px solid black;
+
+    & .card-title {
+        border-bottom: 10px solid black;
+    }
+
+    & .health {
+        border-left: 10px solid black;
+        border-top: 10px solid black;
+    }
+
+    & .power {
+        border-right: 10px solid black;
+        border-top: 10px solid black;
+    }
+}
+
+.skin-white {
+    border: 15px solid white;
+
+    & .card-title {
+        background-color: #333;
+        color: white;
+        border-bottom: 10px solid white;
+    }
+
+    & .health {
+        border-left: 10px solid white;
+        border-top: 10px solid white;
+    }
+
+    & .power {
+        border-right: 10px solid white;
+        border-top: 10px solid white;
+    }
+}
+
+/* Define the rainbow border animation */
+@keyframes rainbow-border {
+    0% {
+        border-color: red;
+    }
+
+    14% {
+        border-color: orange;
+    }
+
+    28% {
+        border-color: yellow;
+    }
+
+    42% {
+        border-color: green;
+    }
+
+    57% {
+        border-color: blue;
+    }
+
+    71% {
+        border-color: indigo;
+    }
+
+    85% {
+        border-color: violet;
+    }
+
+    100% {
+        border-color: red;
+    }
+}
+
+.skin-rainbow {
+    border: 15px solid;
+    animation: rainbow-border 3s linear infinite;
+    position: relative;
+
+    & .card-title {
+        border-bottom: 10px solid;
+        animation: rainbow-border 3s linear infinite;
+    }
+
+    & .health {
+        border-left: 10px solid;
+        border-top: 10px solid;
+        animation: rainbow-border 3s linear infinite;
+    }
+
+    & .power {
+        border-right: 10px solid;
+        border-top: 10px solid;
+        animation: rainbow-border 3s linear infinite;
+    }
+}

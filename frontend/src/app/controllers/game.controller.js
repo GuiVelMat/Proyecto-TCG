@@ -2,8 +2,8 @@ import cardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 import { renderCardsDeck } from "./canvas.controller.js";
+import { getSelectedSkin } from "./user.controller.js";
 
-console.log(getCurrentUser());
 // ===========================================================================
 // Render Active Cards
 // ===========================================================================
@@ -27,7 +27,7 @@ const renderActiveCardPlayer = async (getInfo) => {
     const renderedCard = document.createElement('div');
     renderedCard.innerHTML = `
         <div class="active-card-container">
-            <div class="card" id="active-card" style="background-color: ${backgroundColor};">                
+            <div class="card ${getSelectedSkin()}" id="active-card" style="background-color: ${backgroundColor};">                
                 <div class="card-title">
                     <p class="card-name">${activeCard.name}</p>
                 </div>
@@ -183,7 +183,6 @@ const startTurnTimer = async () => {
     }, 1000);
 };
 
-
 const stopTurnTimer = () => {
     clearInterval(timerInterval);
 }
@@ -208,7 +207,6 @@ const endTurn = async () => {
 
         if (parseInt(cpuCardHealthElement.textContent, 10) <= 0) {
             endGame('player');
-            // return; // Exit early to prevent further execution
         }
 
         playerTurn = false; // Switch turn to CPU
@@ -219,7 +217,6 @@ const endTurn = async () => {
 
         if (parseInt(playerCardHealthElement.textContent, 10) <= 0) {
             endGame('cpu');
-            // return; // Exit early to prevent further execution
         }
 
         playerTurn = true; // Switch turn back to player
@@ -232,11 +229,9 @@ const endTurn = async () => {
 const getActiveCardStats = (containerSelector) => {
     const powerElement = document.querySelector(`${containerSelector} .power`);
     const healthElement = document.querySelector(`${containerSelector} .health`);
-    // const typeElement = document.querySelector(`${containerSelector} .card-type`);
     return {
         power: parseInt(powerElement.textContent, 10), // Ensure it's a number
         health: healthElement, // Keep reference to the health element itself
-        // type: typeElement
     };
 };
 

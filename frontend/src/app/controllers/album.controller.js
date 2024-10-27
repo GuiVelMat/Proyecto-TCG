@@ -1,6 +1,7 @@
 import CardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
+import { getSelectedSkin } from "./user.controller.js";
 
 const loadAlbum = async () => {
     try {
@@ -55,7 +56,7 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
         renderedCard.innerHTML = `
             <p class="card-count">${count}</p>
             <div class="card-container">
-                <div class="card" style="background-color: ${backgroundColor}; filter: ${grayscale};">
+                <div class="card ${getSelectedSkin()}" style="background-color: ${backgroundColor}; filter: ${grayscale};">
                     <div class="card-title">
                         <p class="card-name">${card.name}</p>
                     </div>
