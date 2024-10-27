@@ -45,42 +45,49 @@ const renderActiveCardPlayer = async (getInfo) => {
     // attachDeckCardClickEvents();
 };
 
-const renderActiveCardCPU = async (getInfo) => {
-    const username = getCurrentUser();
-    const activeCard = await cardService.getActiveCPURandom(1);
-    console.log(activeCard);
+let currentCPUCard = null; // Global variable to store the active CPU card for the current turn
 
-    if (getInfo) {
-        return activeCard;
+const renderActiveCardCPU = async (getInfo) => {
+    if (getInfo && currentCPUCard) {
+        return currentCPUCard; // Return the stored card if info is requested
     }
 
-    const deckActive = document.querySelector('.active-card-container-cpu');
-    deckActive.innerHTML = '';
+    const username = getCurrentUser();
+    currentCPUCard = await cardService.getActiveCPURandom(1); // Fetch and store the random CPU card
 
-    const urlImg = `${window.location.origin}/src/assets/${activeCard.image}`;
-    const backgroundColor = getCardColor(activeCard.type);
+    // Only render the card if getInfo is false
+    if (!getInfo) {
+        const deckActive = document.querySelector('.active-card-container-cpu');
+        deckActive.innerHTML = '';
 
-    const renderedCard = document.createElement('div');
-    renderedCard.innerHTML = `
-        <div class="active-card-container">
-            <div class="card" id="active-card" style="background-color: ${backgroundColor}; border: 10px solid red">                
-                <div class="card-title" style="border-bottom: 10px solid red;">
-                    <p class="card-name">${activeCard.name}</p>
-                </div>
-                <div class="card-img">
-                    <img src="${urlImg}" alt="${activeCard.name}" />
-                </div>
-                <div class="card-info">
-                    <p class="power" style="border-right: 10px solid red; border-top: 10px solid red;">${activeCard.power}</p>
-                    <p class="rarity">${activeCard.rarity}</p>
-                    <p class="health" style="border-left: 10px solid red; border-top: 10px solid red;">${activeCard.health}</p>
+        const urlImg = `${window.location.origin}/src/assets/${currentCPUCard.image}`;
+        const backgroundColor = getCardColor(currentCPUCard.type);
+
+        const renderedCard = document.createElement('div');
+        renderedCard.innerHTML = `
+            <div class="active-card-container">
+                <div class="card" id="active-card" style="background-color: ${backgroundColor}; border: 10px solid red">                
+                    <div class="card-title" style="border-bottom: 10px solid red;">
+                        <p class="card-name">${currentCPUCard.name}</p>
+                    </div>
+                    <div class="card-img">
+                        <img src="${urlImg}" alt="${currentCPUCard.name}" />
+                    </div>
+                    <div class="card-info">
+                        <p class="power" style="border-right: 10px solid red; border-top: 10px solid red;">${currentCPUCard.power}</p>
+                        <p class="rarity">${currentCPUCard.rarity}</p>
+                        <p class="health" style="border-left: 10px solid red; border-top: 10px solid red;">${currentCPUCard.health}</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
 
-    deckActive.appendChild(renderedCard);
+        deckActive.appendChild(renderedCard);
+    }
+
+    return currentCPUCard; // Return the card info if needed
 };
+
 
 const getCardColor = (type) => {
     switch (type) {
@@ -124,6 +131,8 @@ let turnTimer = 15; // Turn time limit in seconds
 let timerInterval;  // Interval ID for the countdown
 let cpuAttackPower = 0;
 let turnDisplay = document.querySelector('.turn-display');
+const playerCard = await renderActiveCardPlayer('getInfo');
+const cpuCard = await renderActiveCardCPU('getInfo');
 
 // HTML elements
 const endTurnButton = document.createElement('button');
@@ -134,6 +143,24 @@ document.body.appendChild(endTurnButton);
 const timerDisplay = document.createElement('div');
 timerDisplay.className = "timer";
 document.body.appendChild(timerDisplay);
+
+const typeEffectiveness = {
+    fire: {
+        water: 0.5,
+        grass: 2,
+        fire: 1,
+    },
+    water: {
+        grass: 0.5,
+        fire: 2,
+        water: 1,
+    },
+    grass: {
+        fire: 0.5,
+        water: 2,
+        grass: 1,
+    }
+};
 
 const startTurnTimer = async () => {
     turnTimer = 15;
@@ -155,19 +182,21 @@ const stopTurnTimer = () => {
 
 const endTurn = async () => {
     stopTurnTimer();
+    console.log(playerCard.type);
+    console.log(currentCPUCard.type);
 
     // Get active card stats
     const {
         power: playerCardPower,
-        health: playerCardHealthElement
+        health: playerCardHealthElement,
     } = getActiveCardStats('.active-card-container-player');
 
     const {
-        health: cpuCardHealthElement
+        health: cpuCardHealthElement,
     } = getActiveCardStats('.active-card-container-cpu');
 
     if (playerTurn) {
-        applyDamage(cpuCardHealthElement, playerCardPower);
+        applyDamage(cpuCardHealthElement, playerCardPower, playerCard.type, currentCPUCard.type);
 
         if (parseInt(cpuCardHealthElement.textContent, 10) <= 0) {
             endGame('player');
@@ -178,7 +207,7 @@ const endTurn = async () => {
         turnDisplay.textContent = "CPU's turn";
         startCPUTurn();
     } else {
-        applyDamage(playerCardHealthElement, cpuAttackPower); // Use the global cpuAttackPower
+        applyDamage(playerCardHealthElement, cpuAttackPower, currentCPUCard.type, playerCard.type); // Use the global cpuAttackPower
 
         if (parseInt(playerCardHealthElement.textContent, 10) <= 0) {
             endGame('cpu');
@@ -195,15 +224,24 @@ const endTurn = async () => {
 const getActiveCardStats = (containerSelector) => {
     const powerElement = document.querySelector(`${containerSelector} .power`);
     const healthElement = document.querySelector(`${containerSelector} .health`);
+    // const typeElement = document.querySelector(`${containerSelector} .card-type`);
     return {
         power: parseInt(powerElement.textContent, 10), // Ensure it's a number
-        health: healthElement // Keep reference to the health element itself
+        health: healthElement, // Keep reference to the health element itself
+        // type: typeElement
     };
 };
 
-const applyDamage = (healthElement, damage) => {
+const applyDamage = (healthElement, basePower, attackerType, defenderType) => {
+    console.log(attackerType, defenderType);
     const currentHealth = parseInt(healthElement.textContent, 10);
-    healthElement.textContent = currentHealth - damage; // Update health
+
+    // Calculate damage based on type effectiveness
+    const effectiveness = typeEffectiveness[attackerType][defenderType];
+    const damage = Math.max(1, Math.floor(basePower * effectiveness)); // Minimum damage of 1
+
+    // Update health
+    healthElement.textContent = Math.max(0, currentHealth - damage);
 };
 
 const startCPUTurn = () => {
@@ -235,7 +273,7 @@ const endGame = async (winner) => {
     clearInterval(timerInterval);
 
     const username = getCurrentUser();
-    const activeCard = await UserService.addRandomCardToAlbumUser(username);
+    // const activeCard = await UserService.addRandomCardToAlbumUser(username);
 
     Swal.fire({
         icon: icon,
@@ -254,8 +292,6 @@ const endGame = async (winner) => {
         }
     });
 };
-
-
 
 // ===========================================================================
 // Listeners
