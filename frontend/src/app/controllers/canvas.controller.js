@@ -120,7 +120,7 @@ const rightZone = {
         if (!card.inRightZone) {
             this.totalPower += card.power;
             card.inRightZone = true;
-            setRightZonePower(this.totalPower + card.power); //manda al active card
+            setRightZonePower(this.totalPower); //manda al active card
         }
     },
 
@@ -128,7 +128,7 @@ const rightZone = {
         if (card.inRightZone) {
             this.totalPower -= card.power;
             card.inRightZone = false;
-            setRightZonePower(this.totalPower + card.power); //manda al active card
+            setRightZonePower(this.totalPower); //manda al active card
         }
     },
 

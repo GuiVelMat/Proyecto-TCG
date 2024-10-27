@@ -1,11 +1,17 @@
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 
+// ===========================================================================
+// Render Active Cards
+// ===========================================================================
 
-
-const renderActiveCardPlayer = async () => {
+const renderActiveCardPlayer = async (getPower) => {
     const username = getCurrentUser();
     const activeCard = await UserService.getActiveCardUser(username);
+
+    if (getPower) {
+        return activeCard.power;
+    }
 
     // console.log(activeCard);
 
@@ -72,6 +78,20 @@ const renderActiveCardCPU = async () => {
     deckActive.appendChild(renderedCard);
 };
 
+const getCardColor = (type) => {
+    switch (type) {
+        case 'fire': return 'tomato';
+        case 'water': return 'skyblue';
+        case 'grass': return 'lightgreen';
+        case 'mana': return 'lightgrey';
+        default: return 'white';
+    }
+};
+
+// ===========================================================================
+// Actualizar el poder de la carta del jugador cuando añades maná
+// ===========================================================================
+
 let rightZonePower = 0;  // Global variable to track total power
 
 // Function to update the player's card power in the DOM
@@ -84,19 +104,17 @@ const updatePlayerCardPower = (newPower) => {
 
 // Setter function for `rightZonePower` to update both the variable and the DOM
 export const setRightZonePower = (power) => {
-    rightZonePower = power;
-    updatePlayerCardPower(rightZonePower);
+    renderActiveCardPlayer('getPower').then(basePower => {
+        console.log(power);
+        rightZonePower = power + basePower;
+        updatePlayerCardPower(rightZonePower);
+    });
+
 };
 
-const getCardColor = (type) => {
-    switch (type) {
-        case 'fire': return 'tomato';
-        case 'water': return 'skyblue';
-        case 'grass': return 'lightgreen';
-        case 'mana': return 'lightgrey';
-        default: return 'white';
-    }
-};
+// ===========================================================================
+// initialize game
+// ===========================================================================
 
 const onInit = async () => {
     try {
