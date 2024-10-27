@@ -10,15 +10,18 @@
 
 <body>
     <main>
-        <section id="game-board">
-            <!-- Game content will go here -->
-        </section>
+        <div class="active-card-container-player"></div>
+        <div class="active-card-container-cpu"></div>
+        <canvas id="gameCanvas" width="1800" height="900" style="border:1px solid #000000;"></canvas>
 
-        <!-- GO BACK BUTTON -->
+
         <a href="../main-menu/menu.html" class="go-back">GO BACK</a>
     </main>
 
-    <script src="../../controllers/game.controller.js"></script>
+
+
+    <script type="module" src="../../controllers/game.controller.js"></script>
+    <script type="module" src="../../controllers/canvas.controller.js"></script>
 </body>
 
 </html>
