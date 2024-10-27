@@ -8,5 +8,7 @@ module.exports = (app) => {
 
     app.get('/cardRandom', cardController.getRandomCardFromAlbum);
 
+    app.post('/cpuRandomActive/:power', cardController.getRandomActiveCPU);
+
     app.post('/card/create', cardController.createCard);
 }

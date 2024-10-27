@@ -167,13 +167,14 @@ exports.removeCardFromDeck = async (req, res) => {
 exports.randomCardToAlbum = async (req, res) => {
     try {
         const { username } = req.params;
+        // return res.json(username);
 
         const user = await User.findOne({ username: username })
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const card = await cardController.getRandomCardFromAlbum();
+        const card = await cardController.getRandomCardFromAlbum(req, res, 'userController');
         user.album.push(card.id);
         await user.save();
 

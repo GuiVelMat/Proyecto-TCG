@@ -35,7 +35,7 @@ exports.findOneCard = async (req, res) => {
     }
 }
 
-exports.getRandomCardFromAlbum = async (req, res) => {
+exports.getRandomCardFromAlbum = async (req, res, where) => {
     try {
         let Rarity;
         const randomNum = Math.random();
@@ -56,6 +56,24 @@ exports.getRandomCardFromAlbum = async (req, res) => {
         }
 
         const randomCard = filteredCards[Math.floor(Math.random() * filteredCards.length)];
+
+        // return randomCard.toCardResponse();
+        if (where === 'userController') {
+            return randomCard.toCardResponse();
+        } else {
+            return res.json(randomCard.toCardResponse());
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error retrieving random card", error: error.message });
+    }
+}
+
+exports.getRandomActiveCPU = async (req, res) => {
+    try {
+        const { power } = req.params;
+
+        const cards = await Card.find({ isMana: false, power: power }).exec();
+        const randomCard = cards[Math.floor(Math.random() * cards.length)];
 
         return res.json(randomCard.toCardResponse());
     } catch (error) {
