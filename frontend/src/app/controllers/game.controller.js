@@ -120,7 +120,8 @@ export const setRightZonePower = (power) => {
 let playerTurn = true; // Boolean to track if it's the player's turn
 let turnTimer = 15; // Turn time limit in seconds
 let timerInterval;  // Interval ID for the countdown
-let cpuAttackPower;
+let cpuAttackPower = 0;
+let turnDisplay = document.querySelector('.turn-display');
 
 // HTML elements
 const endTurnButton = document.createElement('button');
@@ -160,7 +161,6 @@ const endTurn = async () => {
     } = getActiveCardStats('.active-card-container-player');
 
     const {
-        power: cpuCardPower,
         health: cpuCardHealthElement
     } = getActiveCardStats('.active-card-container-cpu');
 
@@ -173,6 +173,7 @@ const endTurn = async () => {
         }
 
         playerTurn = false; // Switch turn to CPU
+        turnDisplay.textContent = "CPU's turn";
         startCPUTurn();
     } else {
         applyDamage(playerCardHealthElement, cpuAttackPower); // Use the global cpuAttackPower
@@ -183,6 +184,7 @@ const endTurn = async () => {
         }
 
         playerTurn = true; // Switch turn back to player
+        turnDisplay.textContent = 'Your turn';
         startTurnTimer(); // Restart the timer for player's turn
     }
 };
@@ -205,15 +207,13 @@ const applyDamage = (healthElement, damage) => {
 const startCPUTurn = () => {
     cpuAttackPower = getCpuAttackPower(); // Store random CPU attack power globally
     const cpuPower = document.querySelector(`.active-card-container-cpu .power`);
-
-    console.log(cpuPower);
     cpuPower.textContent = cpuAttackPower; // Update CPU's displayed power
+
     setTimeout(() => {
         endTurn(); // Call endTurn after 1 second
     }, 1000); // CPU attack after a 1 second delay
 };
 
-// Function to get a random CPU attack power between 1 and 4
 const getCpuAttackPower = () => {
     return Math.floor(Math.random() * 3) + 1; // Generates a number between 1 and 4
 };
