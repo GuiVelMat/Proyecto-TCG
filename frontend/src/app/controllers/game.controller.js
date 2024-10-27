@@ -1,6 +1,8 @@
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 
+
+
 const renderActiveCardPlayer = async () => {
     const username = getCurrentUser();
     const activeCard = await UserService.getActiveCardUser(username);
@@ -34,7 +36,7 @@ const renderActiveCardPlayer = async () => {
 
     deckActive.appendChild(renderedCard);
     // attachDeckCardClickEvents();
-}
+};
 
 const renderActiveCardCPU = async () => {
     const username = getCurrentUser();
@@ -68,7 +70,23 @@ const renderActiveCardCPU = async () => {
     `;
 
     deckActive.appendChild(renderedCard);
-}
+};
+
+let rightZonePower = 0;  // Global variable to track total power
+
+// Function to update the player's card power in the DOM
+const updatePlayerCardPower = (newPower) => {
+    const powerElement = document.querySelector('.active-card-container-player .power');
+    if (powerElement) {
+        powerElement.textContent = `${newPower}`;
+    }
+};
+
+// Setter function for `rightZonePower` to update both the variable and the DOM
+export const setRightZonePower = (power) => {
+    rightZonePower = power;
+    updatePlayerCardPower(rightZonePower);
+};
 
 const getCardColor = (type) => {
     switch (type) {
