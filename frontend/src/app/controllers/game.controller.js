@@ -1,7 +1,9 @@
 import cardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
+import { renderCardsDeck } from "./canvas.controller.js";
 
+console.log(getCurrentUser());
 // ===========================================================================
 // Render Active Cards
 // ===========================================================================
@@ -114,13 +116,13 @@ const updatePlayerCardPower = (newPower) => {
 };
 
 // Setter function for `rightZonePower` to update both the variable and the DOM
-export const setRightZonePower = (power) => {
+export const setRightZonePower = async (power) => {
     renderActiveCardPlayer('getPower').then(activeCard => {
         rightZonePower = power + activeCard.power;
         updatePlayerCardPower(rightZonePower);
     });
-
 };
+
 
 // ===========================================================================
 // Lógica del juego
@@ -166,6 +168,11 @@ const startTurnTimer = async () => {
     turnTimer = 15;
     timerDisplay.innerText = `Time Left: ${turnTimer}s`;
 
+    // Refresh the player deck at the start of the player's turn
+    if (playerTurn) {
+        await renderCardsDeck(); // Reload the rendered deck
+    }
+
     timerInterval = setInterval(() => {
         turnTimer -= 1;
         timerDisplay.innerText = `Time Left: ${turnTimer}s`;
@@ -174,7 +181,8 @@ const startTurnTimer = async () => {
             endTurn();
         }
     }, 1000);
-}
+};
+
 
 const stopTurnTimer = () => {
     clearInterval(timerInterval);
@@ -279,6 +287,7 @@ const endGame = async (winner) => {
     if (winner === 'player') {
         const username = getCurrentUser();
         const activeCard = await UserService.addRandomCardToAlbumUser(username);
+        await UserService.addCredits(3);
         message = `${activeCard.name} has been added to your collection!`;
     }
 

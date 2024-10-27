@@ -19,7 +19,7 @@ const loadImage = (src) => {
 };
 
 // Fetch card data from the backend and render deck
-const renderCardsDeck = async () => {
+export const renderCardsDeck = async () => {
     const username = getCurrentUser();
     const userDeck = await UserService.getDeckUser(username);
 
@@ -29,8 +29,11 @@ const renderCardsDeck = async () => {
     const cardHeight = 230;
     const cardSpacing = -30;
 
-    // Create card objects from userDeck data with preloaded images
-    cards = userDeck.map((card, index) => ({
+    // Shuffle userDeck and take the first 3 cards
+    const shuffledDeck = userDeck.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+    // Create card objects from the 3 selected cards with preloaded images
+    cards = shuffledDeck.map((card, index) => ({
         ...card,
         image: loadImage(`${window.location.origin}/src/assets/${card.image}`),
         x: startX + (cardWidth + cardSpacing) * (index % 4),
@@ -45,6 +48,7 @@ const renderCardsDeck = async () => {
     rightZone.draw();
     drawCards();
 };
+
 
 // Function to draw a single card
 function drawCard(card) {
@@ -138,7 +142,7 @@ const rightZone = {
         ctx.fillStyle = "#fff";
         ctx.font = "20px Arial";
         ctx.textAlign = "left";
-        ctx.fillText("Mana Power: " + this.totalPower, this.x + 10, this.y + 30);
+        ctx.fillText("Total mana power used: " + this.totalPower, this.x + 10, this.y + 30);
     }
 };
 
