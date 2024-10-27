@@ -1,142 +1,152 @@
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
+import { setRightZonePower } from './game.controller.js';
 
 let canvas = document.getElementById("gameCanvas");
 let ctx = canvas.getContext("2d");
 
 // ===========================================================================
-// Pintar las cartas
+// Card Rendering and Deck Loading
 // ===========================================================================
 
 let cards = [];
 
-// Traer los datos de las cartas desde backend
+// Function to load and cache images for each card
+const loadImage = (src) => {
+    const img = new Image();
+    img.src = src;
+    return img;
+};
+
+// Fetch card data from the backend and render deck
 const renderCardsDeck = async () => {
     const username = getCurrentUser();
     const userDeck = await UserService.getDeckUser(username);
 
-    // Definir la posición inicial y el espaciado para las cartas
-    const startX = 20; // Posición inicial en X
-    const startY = 530; // Posición inicial en Y
-    const cardWidth = 180; // Ancho de la carta
-    const cardHeight = 230; // Altura de la carta
-    const cardSpacing = -30; // Espacio entre cartas
+    const startX = 20;
+    const startY = 530;
+    const cardWidth = 180;
+    const cardHeight = 230;
+    const cardSpacing = -30;
 
-    // Crear objetos de carta a partir de los datos de userDeck
-    cards = userDeck.map((card, index) => {
-        return {
-            x: startX + (cardWidth + cardSpacing) * (index % 4), // Ajustar posición X
-            y: startY + Math.floor(index / 4) * (cardHeight + cardSpacing), // Ajustar posición Y según las filas
-            width: cardWidth,
-            height: cardHeight,
-            name: card.name,
-            power: card.power,
-            description: card.description,
-            imageSrc: `${window.location.origin}/src/assets/${card.image}`,
-            isDragging: false,
-            inRightZone: false,
-        };
-    });
+    // Create card objects from userDeck data with preloaded images
+    cards = userDeck.map((card, index) => ({
+        ...card,
+        image: loadImage(`${window.location.origin}/src/assets/${card.image}`),
+        x: startX + (cardWidth + cardSpacing) * (index % 4),
+        y: startY + Math.floor(index / 4) * (cardHeight + cardSpacing),
+        width: cardWidth,
+        height: cardHeight,
+        isDragging: false,
+        inRightZone: false,
+    }));
 
-    // Después de obtener las cartas, dibujar el estado inicial
     clearCanvas();
-    drawRightZone();
-    drawCards(); // Llamar sin parámetros, usa la variable global cards
+    rightZone.draw();
+    drawCards();
 };
 
-// Función para dibujar las cartas
-function drawCards() {
-    cards.forEach(card => {
-        let cardImage = new Image();
-        cardImage.src = card.imageSrc;
+// Function to draw a single card
+function drawCard(card) {
+    ctx.fillStyle = "#6e4141"; // Card background color
+    ctx.beginPath();
+    ctx.moveTo(card.x + 20, card.y);
+    ctx.lineTo(card.x + card.width - 20, card.y);
+    ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + 20);
+    ctx.lineTo(card.x + card.width, card.y + card.height - 20);
+    ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - 20, card.y + card.height);
+    ctx.lineTo(card.x + 20, card.y + card.height);
+    ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - 20);
+    ctx.lineTo(card.x, card.y + 20);
+    ctx.quadraticCurveTo(card.x, card.y, card.x + 20, card.y);
+    ctx.closePath();
 
-        // Dibujar el fondo de la carta
-        ctx.fillStyle = "#6e4141"; // Color de fondo de la carta
-        ctx.beginPath();
-        ctx.moveTo(card.x + 20, card.y); // Esquina superior izquierda con borde redondeado
-        ctx.lineTo(card.x + card.width - 20, card.y); // Borde superior
-        ctx.quadraticCurveTo(card.x + card.width, card.y, card.x + card.width, card.y + 20); // Esquina superior derecha
-        ctx.lineTo(card.x + card.width, card.y + card.height - 20); // Borde derecho
-        ctx.quadraticCurveTo(card.x + card.width, card.y + card.height, card.x + card.width - 20, card.y + card.height); // Esquina inferior derecha
-        ctx.lineTo(card.x + 20, card.y + card.height); // Borde inferior
-        ctx.quadraticCurveTo(card.x, card.y + card.height, card.x, card.y + card.height - 20); // Esquina inferior izquierda
-        ctx.lineTo(card.x, card.y + 20); // Borde izquierdo
-        ctx.quadraticCurveTo(card.x, card.y, card.x + 20, card.y); // Esquina superior izquierda
-        ctx.closePath();
+    // Shadow effect
+    ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 5;
+    ctx.shadowOffsetY = 5;
+    ctx.fill();
 
-        // Dibujar efecto de sombra
-        ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
-        ctx.shadowBlur = 10;
-        ctx.shadowOffsetX = 5;
-        ctx.shadowOffsetY = 5;
+    ctx.shadowColor = "transparent"; // Reset shadow
 
-        ctx.fill(); // Rellenar el fondo de la carta
+    // Draw card image
+    ctx.drawImage(card.image, card.x + 10, card.y + 50, card.width - 20, card.height - 100);
 
-        // Restablecer la sombra para evitar afectar otros dibujos
-        ctx.shadowColor = "transparent";
+    // Draw name and power areas
+    ctx.fillStyle = "#f8f8f8";
+    ctx.fillRect(card.x, card.y + 5, card.width, 40);
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 24px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(card.name, card.x + card.width / 2, card.y + 30);
 
-        // Dibujar la imagen de la carta una vez que se carga
-        cardImage.onload = () => {
-            ctx.drawImage(cardImage, card.x + 10, card.y + 50, card.width - 20, card.height - 100); // Ajustar la posición y tamaño de la imagen
-        };
-
-        // Dibujar el texto después del fondo y el borde
-        ctx.fillStyle = "#f8f8f8"; // Fondo para el área del título
-        ctx.fillRect(card.x, card.y + 5, card.width, 40); // Área del título
-
-        ctx.fillStyle = "#000000"; // Color del texto
-        ctx.font = "bold 24px Arial"; // Fuente del título
-        ctx.textAlign = "center"; // Centrar el texto horizontalmente
-        ctx.fillText(card.name, card.x + card.width / 2, card.y + 30); // Nombre de la carta centrado
-
-        ctx.fillStyle = "brown"; // Fondo para el área de poder
-        ctx.fillRect(card.x, card.y + card.height - 45, card.width, 40); // Área de poder
-
-        ctx.fillStyle = "#FFFFFF"; // Color del texto para el poder
-        ctx.fillText("Poder: " + card.power, card.x + card.width / 2, card.y + card.height - 20); // Texto de poder centrado
-
-        // Dibujar el borde de la carta
-        ctx.strokeStyle = "gold"; // Color del borde
-        ctx.lineWidth = 10; // Ancho del borde
-        ctx.stroke(); // Dibujar el borde
-    });
-}
-
-// ===========================================================================
-// Lógica de la zona del mana
-// ===========================================================================
-
-// Right-side drop zone
-let rightZone = { x: 1200, y: 500, width: 600, height: 400, color: "rgba(0, 0, 0, 0.4)" };
-let rightZonePower = 0;
-
-// Function to draw the right zone and power total
-function drawRightZone() {
-    ctx.fillStyle = rightZone.color;
-    ctx.fillRect(rightZone.x, rightZone.y, rightZone.width, rightZone.height);
-
-    // Draw the power total inside the right zone
+    ctx.fillStyle = "brown";
+    ctx.fillRect(card.x, card.y + card.height - 45, card.width, 40);
     ctx.fillStyle = "#fff";
-    ctx.textAlign = "left"; // Centrar el texto horizontalmente
-    ctx.font = "20px Arial";
-    ctx.fillText("Total Power: " + rightZonePower, rightZone.x + 10, rightZone.y + 30);
+    ctx.fillText("Power: " + card.power, card.x + card.width / 2, card.y + card.height - 20);
+
+    // Draw card border
+    ctx.strokeStyle = "gold";
+    ctx.lineWidth = 10;
+    ctx.stroke();
 }
 
-// Function to check if the card is inside the right zone
-function isCardInZone(card, zone) {
-    return card.x + card.width / 2 > zone.x &&
-        card.x + card.width / 2 < zone.x + zone.width &&
-        card.y + card.height / 2 > zone.y &&
-        card.y + card.height / 2 < zone.y + zone.height;
+// Function to draw all cards
+function drawCards() {
+    cards.forEach(drawCard);
 }
 
-// Function to arrange cards in the zone without overlap
+// ===========================================================================
+// Mana Zone Logic
+// ===========================================================================
+
+const rightZone = {
+    x: 1200,
+    y: 500,
+    width: 600,
+    height: 400,
+    color: "rgba(0, 0, 0, 0.4)",
+    totalPower: 0,
+
+    contains(card) {
+        return card.x + card.width / 2 > this.x &&
+            card.x + card.width / 2 < this.x + this.width &&
+            card.y + card.height / 2 > this.y &&
+            card.y + card.height / 2 < this.y + this.height;
+    },
+
+    addCard(card) {
+        if (!card.inRightZone) {
+            this.totalPower += card.power;
+            card.inRightZone = true;
+            setRightZonePower(this.totalPower + card.power); //manda al active card
+        }
+    },
+
+    removeCard(card) {
+        if (card.inRightZone) {
+            this.totalPower -= card.power;
+            card.inRightZone = false;
+            setRightZonePower(this.totalPower + card.power); //manda al active card
+        }
+    },
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText("Total Power: " + this.totalPower, this.x + 10, this.y + 30);
+    }
+};
+
+// Arrange cards in the zone without overlap
 function arrangeCardsInZone() {
-    let offset = 80; // Offset between cards
+    let offset = 80;
     let startX = rightZone.x + 30;
     let startY = rightZone.y + 80;
-
-    // Filter cards that are in the zone and arrange them with an offset
     let cardsInZone = cards.filter(card => card.inRightZone);
     cardsInZone.forEach((card, index) => {
         card.x = startX + index * offset;
@@ -150,87 +160,81 @@ function clearCanvas() {
 }
 
 // ===========================================================================
-// Lógica del drag and drop
+// Drag and Drop Logic
 // ===========================================================================
 
 let draggedCard = null;
 let offsetX, offsetY;
 
-// Mouse down event to start dragging a card
-canvas.addEventListener('mousedown', function (e) {
-    let mouseX = e.offsetX;
-    let mouseY = e.offsetY;
-
-    // Check if the mouse is on any card
-    cards.forEach(card => {
-        if (mouseX > card.x && mouseX < card.x + card.width && mouseY > card.y && mouseY < card.y + card.height) {
-            draggedCard = card;
-            offsetX = mouseX - card.x;
-            offsetY = mouseY - card.y;
-            card.isDragging = true;
-        }
-    });
-});
-
-// Mouse move event to drag the card
-canvas.addEventListener('mousemove', function (e) {
+function handleMouseDown(e) {
+    const { offsetX: mouseX, offsetY: mouseY } = e;
+    draggedCard = cards.find(card => mouseX > card.x && mouseX < card.x + card.width && mouseY > card.y && mouseY < card.y + card.height);
     if (draggedCard) {
-        let mouseX = e.offsetX;
-        let mouseY = e.offsetY;
-
-        // Update the position of the dragged card
-        draggedCard.x = mouseX - offsetX;
-        draggedCard.y = mouseY - offsetY;
-
-        // Redraw the canvas
-        clearCanvas();
-        drawRightZone();
-        drawCards();
+        offsetX = mouseX - draggedCard.x;
+        offsetY = mouseY - draggedCard.y;
+        draggedCard.isDragging = true;
     }
-});
+}
 
-canvas.addEventListener('mouseup', function () {
+function handleMouseMove(e) {
     if (draggedCard) {
-        // Check if the dragged card is inside the right zone
-        if (isCardInZone(draggedCard, rightZone)) {
-            // If card was not in the zone previously, add its power to the total
-            if (!draggedCard.inRightZone) {
-                rightZonePower += draggedCard.power;
-                draggedCard.inRightZone = true; // Update status
-            }
+        draggedCard.x = e.offsetX - offsetX;
+        draggedCard.y = e.offsetY - offsetY;
+        renderDragFrame();
+    }
+}
 
-            // Center the card within the zone
-            arrangeCardsInZone(); // Arrange cards inside the zone
+function handleMouseUp() {
+    if (draggedCard) {
+        if (rightZone.contains(draggedCard)) {
+            rightZone.addCard(draggedCard);
+            arrangeCardsInZone();
         } else {
-            // If card was in the zone and now outside, subtract its power from the total
-            if (draggedCard.inRightZone) {
-                rightZonePower -= draggedCard.power;
-                draggedCard.inRightZone = false; // Update status
-            }
-            // rightZone.color = "#AAAAAA"; // Reset the zone color if empty
+            rightZone.removeCard(draggedCard);
         }
 
         draggedCard.isDragging = false;
         draggedCard = null;
 
-        // Redraw the canvas with updated zone color and power total
         clearCanvas();
-        drawRightZone();
+        rightZone.draw();
         drawCards();
     }
-});
+}
 
-// Initial draw
+// Draw the frame during dragging
+function renderDragFrame() {
+    clearCanvas();
+    rightZone.draw();
+    cards.forEach(card => {
+        if (!card.isDragging) drawCard(card);
+    });
+    if (draggedCard) drawCard(draggedCard);
+}
+
+// ===========================================================================
+// Event Listeners
+// ===========================================================================
+
+// Attach event listeners
+function addEventListeners() {
+    canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mouseup', handleMouseUp);
+}
+
+// ===========================================================================
+// Initialization
+// ===========================================================================
 
 const onInit = async () => {
     try {
-        renderCardsDeck();
-        drawRightZone();
+        await renderCardsDeck();
         drawCards();
+        addEventListeners();
     } catch (error) {
-        console.error(error);
+        console.error("Initialization error:", error);
     }
-
 };
 
 onInit();
