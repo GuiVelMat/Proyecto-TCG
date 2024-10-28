@@ -51,7 +51,7 @@ export const renderCardsDeck = async () => {
 
 
 // Function to draw a single card
-function drawCard(card) {
+const drawCard = (card) => {
     ctx.fillStyle = "#6e4141"; // Card background color
     ctx.beginPath();
     ctx.moveTo(card.x + 20, card.y);
@@ -97,7 +97,7 @@ function drawCard(card) {
 }
 
 // Function to draw all cards
-function drawCards() {
+const drawCards = () => {
     cards.forEach(drawCard);
 }
 
@@ -147,7 +147,7 @@ const rightZone = {
 };
 
 // Arrange cards in the zone without overlap
-function arrangeCardsInZone() {
+const arrangeCardsInZone = () => {
     let offset = 80;
     let startX = rightZone.x + 30;
     let startY = rightZone.y + 80;
@@ -159,7 +159,7 @@ function arrangeCardsInZone() {
 }
 
 // Clear the canvas
-function clearCanvas() {
+const clearCanvas = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -170,7 +170,7 @@ function clearCanvas() {
 let draggedCard = null;
 let offsetX, offsetY;
 
-function handleMouseDown(e) {
+const handleMouseDown = (e) => {
     const { offsetX: mouseX, offsetY: mouseY } = e;
     draggedCard = cards.find(card => mouseX > card.x && mouseX < card.x + card.width && mouseY > card.y && mouseY < card.y + card.height);
     if (draggedCard) {
@@ -180,7 +180,7 @@ function handleMouseDown(e) {
     }
 }
 
-function handleMouseMove(e) {
+const handleMouseMove = (e) => {
     if (draggedCard) {
         draggedCard.x = e.offsetX - offsetX;
         draggedCard.y = e.offsetY - offsetY;
@@ -188,7 +188,7 @@ function handleMouseMove(e) {
     }
 }
 
-function handleMouseUp() {
+const handleMouseUp = () => {
     if (draggedCard) {
         if (rightZone.contains(draggedCard)) {
             rightZone.addCard(draggedCard);
@@ -207,7 +207,7 @@ function handleMouseUp() {
 }
 
 // Draw the frame during dragging
-function renderDragFrame() {
+const renderDragFrame = () => {
     clearCanvas();
     rightZone.draw();
     cards.forEach(card => {
@@ -221,7 +221,7 @@ function renderDragFrame() {
 // ===========================================================================
 
 // Attach event listeners
-function addEventListeners() {
+const addEventListeners = () => {
     canvas.addEventListener('mousedown', handleMouseDown);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseup', handleMouseUp);

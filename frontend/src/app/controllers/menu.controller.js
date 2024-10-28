@@ -21,10 +21,9 @@ document.getElementById('skin').addEventListener('change', (event) => {
     const skin = event.target.value;
     console.log(`Selected skin: ${skin}`);
     localStorage.setItem('selectedSkin', skin);
-    // applySkin();
 });
 
-document.getElementById('menu-play').addEventListener('click', function (event) {
+document.getElementById('menu-play').addEventListener('click', (event) => {
     event.preventDefault(); // Prevent the default link action
 
     Swal.fire({
