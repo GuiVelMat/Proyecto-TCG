@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 
 const corsOptions = {
-    origin: "http://192.168.1.41:8080",
+    origin: "*", // como es un proyecto pequeño, permitimos cualquier origen
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200

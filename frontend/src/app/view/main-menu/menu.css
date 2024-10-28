@@ -1,5 +1,6 @@
 body {
     background: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0');
+    /* background: url('https://statics.memondo.com/p/s1/vrus/2024/01/VRU_205452_94a9aac2c3d84a24ad3852e4eff4efdc__se_volvio_canon_xd_por_sirlanc36_thumb_hq.jpg?cb=8839482'); */
     background-size: cover;
     font-family: Arial, sans-serif;
     background-color: #f0f8ff;
@@ -47,4 +48,36 @@ a:hover {
 
 #logout-button:hover {
     cursor: pointer;
+}
+
+#skin-selector {
+    margin: 20px 0;
+    border-radius: 15px;
+}
+
+#skin-selector label {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    display: block;
+}
+
+#skin {
+    font-size: 1.2em;
+    padding: 10px;
+    border: 2px solid #ff6347;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: border-color 0.3s ease;
+}
+
+#skin:focus {
+    border-color: #ff4500;
+    outline: none;
+}
+
+#skin option {
+    background-color: #fff;
+    color: #333;
 }

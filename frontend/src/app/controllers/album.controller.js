@@ -1,12 +1,11 @@
 import CardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
+import { getSelectedSkin } from "./user.controller.js";
 
 const loadAlbum = async () => {
     try {
-        const cards = await CardService.getCardList();
-
-        return cards;
+        return await CardService.getCardList();
     } catch (error) {
         console.error('Error loading cards:', error);
     }
@@ -37,22 +36,27 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
     const cardGrid = document.querySelector('.card-grid');
     cardGrid.innerHTML = '';
 
-    // Mapeo de cartas del usuario para fácil búsqueda, sólo necesitamos el nombre para hacer el check
-    const userCardMap = new Map(userCards.map(card => [card.name]));
+    // Mapeo de cartas del usuario para fácil búsqueda, solo necesitamos el nombre para hacer el check
+    const userCardSet = new Set(userCards.map(card => card.name));
     const cardQuantity = [];
 
+    // El fragment nos permite crear un guardado momentaneo de código para usarlo luego.
+    // Esto hace que el código vaya más rápido y no tenga que pintar las cosas una por una.
+    const fragment = document.createDocumentFragment();
 
-    // Crear todas las cartas del album
     cards.forEach(card => {
         const urlImg = `${window.location.origin}/src/assets/${card.image}`;
         const count = cardCount[card.name] || 0;
         cardQuantity.push({ name: card.name, quantity: count });
 
+        const backgroundColor = getCardColor(card.type);
+        const grayscale = !userCardSet.has(card.name) ? 'grayscale(100%)' : 'none';
+
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
+            <p class="card-count">${count}</p>
             <div class="card-container">
-                <p class="card-count">${count}</p>
-                <div class="card" id="card">                
+                <div class="card ${getSelectedSkin()}" style="background-color: ${backgroundColor}; filter: ${grayscale};">
                     <div class="card-title">
                         <p class="card-name">${card.name}</p>
                     </div>
@@ -65,36 +69,29 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
                         <p class="health">${card.health}</p>
                     </div>
                 </div>
-            </div>
+            </div>            
         `;
 
-        // Colorear según tipo de carta
-        switch (card.type) {
-            case 'fire':
-                renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
-                break;
-            case 'water':
-                renderedCard.querySelector('.card').style.backgroundColor = 'skyblue';
-                break;
-            case 'grass':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgreen';
-                break;
-            case 'mana':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
-        }
-
-        // Si la carta no está en el álbum del usuario, aplicar blanco y negro
-        if (!userCardMap.has(card.name)) {
-            const cardElement = renderedCard.querySelector('.card');
-            cardElement.style.filter = 'grayscale(100%)';
-        }
-
-        cardGrid.appendChild(renderedCard);
+        // Aquí es donde el fragment se va llenando con cada info del bucle
+        fragment.appendChild(renderedCard);
     });
 
-    // aquí llamamos a los eventListener
+    // Asignamos el fragment con todas las cartas a la grid de cartas
+    cardGrid.appendChild(fragment);
+
+    // Llamada a los event listeners
     attachCardClickEvents(cardQuantity);
-}
+};
+
+export const getCardColor = (type) => {
+    switch (type) {
+        case 'fire': return 'tomato';
+        case 'water': return 'skyblue';
+        case 'grass': return 'lightgreen';
+        case 'mana': return 'lightgrey';
+        default: return 'white';
+    }
+};
 
 const attachCardClickEvents = async (cardQuantity) => {
     const username = getCurrentUser();
@@ -143,7 +140,7 @@ const attachCardClickEvents = async (cardQuantity) => {
                     cancelButtonText: 'Cancel',
                 }).then(async (result) => {
                     if (result.isConfirmed) {
-                        calculateDeckPower(cardName).then(async (response) => {
+                        calculateDeckPowerInAlbum(cardName).then(async (response) => {
                             if (response === "exceeded") {
                                 // console.log(`Deck Power limit exceeded!`);
                                 Swal.fire({
@@ -173,41 +170,47 @@ const attachCardClickEvents = async (cardQuantity) => {
     });
 }
 
-const calculateDeckPower = async (newCard) => {
+
+
+const calculateDeckPowerInAlbum = async (newCardId) => {
     try {
         const username = getCurrentUser();
         const userDeck = await UserService.getDeckUser(username);
         const activeCard = await UserService.getActiveCardUser(username);
 
-        let totalPower = 0;
+        // Calculate the total power from the user's deck and the active card
+        let totalPower = userDeck.reduce((sum, card) => sum + card.power, activeCard.power);
+        console.log(`Total power before changes: ${totalPower}`);
 
-        userDeck.forEach(card => {
-            totalPower += card.power;
-        });
-        totalPower += activeCard.power;
+        if (newCardId) {
+            const newCard = await CardService.getOneCard(newCardId);
+            let newCardPower = newCard.power;
+            console.log(newCardPower);
 
-        if (newCard) {
-            const newCardPower = await CardService.getOneCard(newCard);
-
-            // newCard es la activeCard
-            if (newCardPower.isMana == false && activeCard.power === newCardPower.power) {
-                // console.log(`Card ${newCard} is already active`);
+            if (!newCard.isMana && activeCard.power >= newCardPower) {
+                totalPower += newCardPower - activeCard.power;
+                updateDeckPowerDisplay(totalPower);
                 return "active";
             }
-            // newCard es un mana
-            if (newCardPower.power + totalPower > 12) {
-                // console.log(`Deck Power ${totalPower} / 12`);
+
+            if (newCardPower - activeCard.power + totalPower > 12) {
+                console.log(`exceeded`);
                 return "exceeded";
             }
 
-            totalPower += newCardPower.power;
+            totalPower += newCardPower - activeCard.power;
+            console.log(`New card total power: ${totalPower}`);
         }
 
-        document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
+        updateDeckPowerDisplay(totalPower);
         return totalPower;
     } catch (error) {
         console.error('Error calculating deck power:', error);
     }
+}
+
+const updateDeckPowerDisplay = (totalPower) => {
+    document.querySelector('.deck-power').textContent = `Deck Power ${totalPower} / 12`;
 }
 
 const onInit = async () => {
@@ -215,7 +218,7 @@ const onInit = async () => {
         const allCards = await loadAlbum(); // Todas las cartas
         const userCards = await loadAlbumUser(); // Cartas del usuario
         renderCardsAlbum(allCards, userCards.cards, userCards.cardCount);
-        calculateDeckPower();
+        calculateDeckPowerInAlbum();
     } catch (error) {
         console.error('Error initializing album:', error);
     }

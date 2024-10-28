@@ -1,6 +1,7 @@
-import CardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
+import { getCardColor } from "./album.controller.js";
+import { getSelectedSkin } from "./user.controller.js";
 
 const loadDeckUser = async () => {
     try {
@@ -31,11 +32,12 @@ const renderDeck = (cards) => {
 
     cards.forEach(card => {
         const urlImg = `${window.location.origin}/src/assets/${card.image}`;
+        const backgroundColor = getCardColor(card.type);
 
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
             <div class="card-container">
-                <div class="card" id="card">                
+                <div class="card ${getSelectedSkin()}" id="card" style="background-color: ${backgroundColor};">                
                     <div class="card-title">
                         <p class="card-name">${card.name}</p>
                     </div>
@@ -51,21 +53,6 @@ const renderDeck = (cards) => {
             </div>
         `;
 
-        // Colorear según tipo de carta
-        switch (card.type) {
-            case 'fire':
-                renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
-                break;
-            case 'water':
-                renderedCard.querySelector('.card').style.backgroundColor = 'skyblue';
-                break;
-            case 'grass':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgreen';
-                break;
-            case 'mana':
-                renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
-        }
-
         deckGrid.appendChild(renderedCard);
     });
 
@@ -77,11 +64,12 @@ const renderActiveCard = (activeCard) => {
     deckActive.innerHTML = '';
 
     const urlImg = `${window.location.origin}/src/assets/${activeCard.image}`;
+    const backgroundColor = getCardColor(activeCard.type);
 
     const renderedCard = document.createElement('div');
     renderedCard.innerHTML = `
         <div class="active-card-container">
-            <div class="card" id="active-card">                
+            <div class="card ${getSelectedSkin()}" id="active-card" style="background-color: ${backgroundColor};">                
                 <div class="card-title">
                     <p class="card-name">${activeCard.name}</p>
                 </div>
@@ -96,21 +84,6 @@ const renderActiveCard = (activeCard) => {
             </div>
         </div>
     `;
-
-    // Colorear según tipo de carta
-    switch (activeCard.type) {
-        case 'fire':
-            renderedCard.querySelector('.card').style.backgroundColor = 'tomato';
-            break;
-        case 'water':
-            renderedCard.querySelector('.card').style.backgroundColor = 'skyblue';
-            break;
-        case 'grass':
-            renderedCard.querySelector('.card').style.backgroundColor = 'lightgreen';
-            break;
-        case 'mana':
-            renderedCard.querySelector('.card').style.backgroundColor = 'lightgrey';
-    }
 
     deckActive.appendChild(renderedCard);
     attachDeckCardClickEvents();
@@ -154,7 +127,6 @@ const calculateDeckPower = async () => {
         let totalPower = 0;
 
         userDeck.forEach(card => {
-            console.log(card.power);
             totalPower += card.power;
         });
 

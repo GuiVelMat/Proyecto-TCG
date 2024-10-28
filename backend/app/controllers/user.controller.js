@@ -167,17 +167,18 @@ exports.removeCardFromDeck = async (req, res) => {
 exports.randomCardToAlbum = async (req, res) => {
     try {
         const { username } = req.params;
+        // return res.json(username);
 
         const user = await User.findOne({ username: username })
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const card = await cardController.getRandomCardFromAlbum();
+        const card = await cardController.getRandomCardFromAlbum(req, res, 'userController');
         user.album.push(card.id);
         await user.save();
 
-        res.status(200).json({ message: "Random Card added to album", album: user.album });
+        res.status(200).json({ message: "Random Card added to album", card: card });
     } catch (error) {
         res.status(500).json({ message: "Error adding card to album", error: error.message });
     }
@@ -197,6 +198,27 @@ exports.setActiveCard = async (req, res) => {
         await user.save();
 
         res.status(200).json({ message: "Active card set", activeCard: user.activeCard });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error setting active card", error: error.message });
+    }
+}
+
+exports.modifyCredits = async (req, res) => {
+    try {
+        const { username, quantity } = req.params;
+        const creditChange = Number(quantity);
+
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // return res.json(user.credits += creditChange);
+        user.credits += creditChange;
+        await user.save();
+
+        res.status(200).json({ message: "Credits updated", credits: user.credits });
     }
     catch (error) {
         res.status(500).json({ message: "Error setting active card", error: error.message });

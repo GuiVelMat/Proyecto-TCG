@@ -6,22 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game View</title>
     <link rel="stylesheet" href="game.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
-    <header>
-        <h1>Game Title</h1>
-    </header>
     <main>
-        <section id="game-board">
-            <!-- Game content will go here -->
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2023 Game Company</p>
-    </footer>
+        <div class="turn-display">Your turn</div>
+        <div class="active-card-container-player"></div>
+        <div class="active-card-container-cpu"></div>
+        <canvas id="gameCanvas" width="1800" height="900" style="border:1px solid #000000;"></canvas>
 
-    <script src="../../controllers/auth.controller.js"></script>
+
+        <!-- <a href="../main-menu/menu.html" class="go-back">GO BACK</a> -->
+    </main>
+
+
+
+    <script type="module" src="../../controllers/game.controller.js"></script>
+    <script type="module" src="../../controllers/canvas.controller.js"></script>
+    <script type="module" src="../../controllers/user.controller.js"></script>
 </body>
 
 </html>

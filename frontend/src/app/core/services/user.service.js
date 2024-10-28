@@ -14,8 +14,8 @@ class UserService {
     }
 
     async addRandomCardToAlbumUser(username) {
-        const cardListUser = await apiService.post(`/user/${username}/albumAddRandom`);
-        return cardListUser.user.album;
+        const newRandomCard = await apiService.post(`/user/${username}/albumAddRandom`);
+        return newRandomCard.card;
     }
 
     // DECK SERVICES
@@ -43,6 +43,13 @@ class UserService {
     async setActiveCardUser(username, cardName) {
         const cardListUser = await apiService.put(`/user/${username}/activeCard/${cardName}`);
         return cardListUser;
+    }
+
+    // CREDIT SERVICES
+
+    async modifyCredits(username, quantity) {
+        const userCredits = await apiService.put(`/user/${username}/credits/${quantity}`);
+        return userCredits.credits;
     }
 
 }
