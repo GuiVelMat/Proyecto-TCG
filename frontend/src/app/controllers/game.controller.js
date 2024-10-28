@@ -2,7 +2,7 @@ import cardService from "../core/services/card.service.js";
 import UserService from "../core/services/user.service.js";
 import { getCurrentUser } from "./auth.controller.js";
 import { renderCardsDeck } from "./canvas.controller.js";
-import { getSelectedSkin } from "./user.controller.js";
+import { getSelectedDifficulty, getSelectedSkin } from "./user.controller.js";
 
 // ===========================================================================
 // Render Active Cards
@@ -55,7 +55,7 @@ const renderActiveCardCPU = async (getInfo) => {
     }
 
     const username = getCurrentUser();
-    currentCPUCard = await cardService.getActiveCPURandom(1); // Fetch and store the random CPU card
+    currentCPUCard = await cardService.getActiveCPURandom(getSelectedDifficulty()); // Fetch and store the random CPU card
 
     // Only render the card if getInfo is false
     if (!getInfo) {
@@ -261,14 +261,6 @@ const getCpuAttackPower = () => {
     return Math.floor(Math.random() * 3) + 1; // Generates a number between 1 and 4
 };
 
-// Function to reset the game state
-const resetGame = () => {
-    playerTurn = true;
-    clearInterval(timerInterval);
-    timerDisplay.innerText = `Time Left: ${turnTimer}s`;
-    startTurnTimer(); // Restart game with timer
-}
-
 // Function to end the game
 const endGame = async (winner) => {
     clearInterval(timerInterval);
@@ -291,13 +283,9 @@ const endGame = async (winner) => {
         icon,
         title,
         text: message,
-        showCancelButton: true,
-        confirmButtonText: 'Play again',
-        cancelButtonText: 'Return to Main Menu'
+        confirmButtonText: 'Return to Main Menu'
     }).then((result) => {
         if (result.isConfirmed) {
-            resetGame();
-        } else if (result.isDismissed) {
             window.location.href = '../main-menu/menu.html';
         }
     });
