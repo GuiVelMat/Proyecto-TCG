@@ -1,6 +1,5 @@
 body {
-    background: url('https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0');
-    /* background: url('https://statics.memondo.com/p/s1/vrus/2024/01/VRU_205452_94a9aac2c3d84a24ad3852e4eff4efdc__se_volvio_canon_xd_por_sirlanc36_thumb_hq.jpg?cb=8839482'); */
+    background: url('../../../assets/background_menu.jpg');
     background-size: cover;
     font-family: Arial, sans-serif;
     background-color: #f0f8ff;
@@ -17,6 +16,9 @@ h1 {
 
 ul {
     display: flex;
+    position: fixed;
+    top: 5%;
+    left: 20%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -25,7 +27,7 @@ ul {
 }
 
 li {
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
 a {
@@ -33,17 +35,19 @@ a {
     align-items: center;
     justify-content: center;
     height: 100px;
-    width: 200px;
+    width: 400px;
     text-decoration: none;
     color: white;
-    background-color: #ff6347;
+    background-color: #5d413c8d;
+    box-shadow: 0 0 10px 5px rgba(219, 205, 201, 0.4);
     border-radius: 10px;
     font-size: 1.5em;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 a:hover {
-    background-color: #ff4500;
+    background-color: #b197929f;
 }
 
 #logout-button:hover {
@@ -51,6 +55,9 @@ a:hover {
 }
 
 #skin-selector {
+    position: fixed;
+    bottom: 10%;
+    left: 25%;
     margin: 20px 0;
     border-radius: 15px;
 }
@@ -58,7 +65,7 @@ a:hover {
 #skin-selector label {
     font-size: 1.5em;
     font-weight: bold;
-    color: #333;
+    color: #fff6f6;
     margin-bottom: 10px;
     display: block;
 }
@@ -66,7 +73,7 @@ a:hover {
 #skin {
     font-size: 1.2em;
     padding: 10px;
-    border: 2px solid #ff6347;
+    border: 2px solid #f2bbb2;
     border-radius: 5px;
     background-color: #fff;
     transition: border-color 0.3s ease;
