@@ -16,15 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
     printUsername();
 });
 
-document.getElementById('skin').value = localStorage.getItem('selectedSkin');
-document.getElementById('skin').addEventListener('change', (event) => {
-    const skin = event.target.value;
-    console.log(`Selected skin: ${skin}`);
-    localStorage.setItem('selectedSkin', skin);
-    // applySkin();
-});
+// document.getElementById('skin').value = localStorage.getItem('selectedSkin');
+// document.getElementById('skin').addEventListener('change', (event) => {
+//     const skin = event.target.value;
+//     console.log(`Selected skin: ${skin}`);
+//     localStorage.setItem('selectedSkin', skin);
+// });
 
-document.getElementById('menu-play').addEventListener('click', function (event) {
+document.getElementById('menu-play').addEventListener('click', (event) => {
     event.preventDefault(); // Prevent the default link action
 
     Swal.fire({

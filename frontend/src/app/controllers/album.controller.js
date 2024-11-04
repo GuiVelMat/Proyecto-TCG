@@ -52,6 +52,8 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
         const backgroundColor = getCardColor(card.type);
         const grayscale = !userCardSet.has(card.name) ? 'grayscale(100%)' : 'none';
 
+        console.log(getSelectedSkin());
+
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
             <p class="card-count">${count}</p>
@@ -193,13 +195,21 @@ const calculateDeckPowerInAlbum = async (newCardId) => {
                 return "active";
             }
 
-            if (newCardPower - activeCard.power + totalPower > 12) {
+            if (!newCard.isMana && newCardPower - activeCard.power + totalPower > 12) {
                 console.log(`exceeded`);
                 return "exceeded";
             }
 
-            totalPower += newCardPower - activeCard.power;
-            console.log(`New card total power: ${totalPower}`);
+            if (newCard.isMana && newCardPower + totalPower > 12) {
+                console.log(`exceeded`);
+                return "exceeded";
+            }
+
+            if (newCard.isMana) {
+                totalPower += newCardPower;
+            } else {
+                totalPower += newCardPower - activeCard.power;
+            }
         }
 
         updateDeckPowerDisplay(totalPower);

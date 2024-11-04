@@ -1,5 +1,5 @@
 export const getSelectedSkin = () => {
-    return localStorage.getItem('selectedSkin');
+    return localStorage.getItem('selectedSkin' || 'default');
 }
 
 export const getSelectedDifficulty = () => {
