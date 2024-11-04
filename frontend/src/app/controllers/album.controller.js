@@ -52,6 +52,8 @@ const renderCardsAlbum = (cards, userCards, cardCount) => {
         const backgroundColor = getCardColor(card.type);
         const grayscale = !userCardSet.has(card.name) ? 'grayscale(100%)' : 'none';
 
+        console.log(getSelectedSkin());
+
         const renderedCard = document.createElement('div');
         renderedCard.innerHTML = `
             <p class="card-count">${count}</p>
