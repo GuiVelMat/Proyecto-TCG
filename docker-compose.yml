@@ -5,7 +5,7 @@ services:
     ports:
       - "27018:27017"
     volumes:
-      - ./db:/data/db
+      - mongo-data:/data/db
     networks:
       - mongo-database
 
@@ -19,6 +19,10 @@ services:
       ME_CONFIG_BASICAUTH: "false"
     networks:
       - mongo-database
+
+volumes:
+  mongo-data:
+
 
 networks:
   mongo-database:
