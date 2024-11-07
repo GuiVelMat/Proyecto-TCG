@@ -79,10 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (usernameInput) {
-        usernameInput.addEventListener('keydown', handleButtonClick);
+        usernameInput.addEventListener('keydown', handleEnterKey);
     }
 
     if (passwordInput) {
-        passwordInput.addEventListener('keydown', handleButtonClick);
+        passwordInput.addEventListener('keydown', handleEnterKey);
+    }
+
+    function handleEnterKey(event) {
+        if (event.key === 'Enter') {
+            handleButtonClick({ target: { id: 'login-button' } });
+        }
     }
 });
